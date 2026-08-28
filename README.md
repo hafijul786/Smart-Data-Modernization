@@ -340,3 +340,56 @@ After running the command, Streamlit will provide a local URL similar to:
 http://localhost:8501
 
 Open the URL in your browser.
+
+📂 Upload Business Data → Analyze CSV → Dynamic KPIs, Charts & Insights
+
+## 📂 Upload Your Own Business Data
+
+The platform allows business owners to upload their own CSV sales data
+and generate dynamic business insights.
+
+### How It Works
+
+1. Open the Smart Data Modernization dashboard.
+2. Go to **Upload Business Data**.
+3. Upload your CSV file.
+4. The system validates and cleans the data.
+5. KPIs and visualizations are generated automatically.
+6. Apply filters such as Year, Category and Region.
+7. View business insights from the uploaded data.
+8. Ask questions using the integrated chatbot.
+
+### Supported Data
+
+The uploaded CSV should contain business sales-related columns such as:
+
+- `order_id`
+- `order_date`
+- `ship_date`
+- `ship_mode`
+- `customer_name`
+- `category`
+- `sub_category`
+- `sales`
+- `quantity`
+- `discount`
+- `profit`
+- `shipping_cost`
+- `region`
+
+### Example Insights
+
+The platform can dynamically identify:
+
+- Total Sales
+- Total Profit
+- Profit Margin
+- Best Performing Category
+- Best Performing Region
+- Top Customers
+- Loss-Making Sub-Categories
+- Sales Trends
+- Regional Performance
+
+> If no custom CSV is uploaded, the application continues using the
+> default Superstore dataset.
