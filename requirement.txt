@@ -1,0 +1,9 @@
+📋 4. Requirements
+
+The project primarily requires:
+
+streamlit
+pandas
+numpy
+scikit-learn
+matplotlib
