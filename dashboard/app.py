@@ -1,6 +1,7 @@
 import streamlit as st
 import pandas as pd
 import os
+import re
 
 # ============================================================
 # PAGE CONFIGURATION
@@ -21,65 +22,780 @@ st.set_page_config(
 st.markdown(
     """
     <style>
-    /* ===== Smart Data Modernization - Premium UI ===== */
-    .stApp { background: #08111f; }
-    [data-testid="stAppViewContainer"] { background: #08111f; }
-    [data-testid="stHeader"] { background: rgba(8,17,31,0.92); }
-    section[data-testid="stSidebar"] {
-        background: linear-gradient(180deg,#0d1728 0%,#09111f 100%);
-        border-right: 1px solid #24324a;
+    /* ===== Smart Data Modernization - Minimal Enterprise UI ===== */
+    .stApp {
+        background: #07111d;
     }
-    section[data-testid="stSidebar"] > div { padding-top: 1.1rem; }
-    section[data-testid="stSidebar"] * { color: #e6edf7; }
+
+    [data-testid="stAppViewContainer"] {
+        background: linear-gradient(180deg, #08111f 0%, #0b1424 100%);
+    }
+
+    [data-testid="stHeader"] {
+        background: rgba(8, 17, 31, 0.82);
+        backdrop-filter: blur(8px);
+        border-bottom: 1px solid rgba(148, 163, 184, 0.18);
+    }
+
+    #MainMenu, footer {
+        visibility: hidden;
+    }
+
+    [data-testid="stAppViewContainer"] > .main {
+        border-top: 1px solid rgba(96, 165, 250, 0.12);
+    }
+
+    main .block-container {
+        padding-top: 1.0rem;
+        padding-bottom: 2.5rem;
+        max-width: 1500px;
+    }
+
+    section[data-testid="stSidebar"] {
+        background: linear-gradient(180deg, #0d1728 0%, #09111f 100%);
+        border-right: 1px solid rgba(148, 163, 184, 0.18);
+    }
+
+    section[data-testid="stSidebar"] > div {
+        padding-top: 1.1rem;
+        padding-left: 0.8rem;
+        padding-right: 0.8rem;
+    }
+
+    section[data-testid="stSidebar"] * {
+        color: #e6edf7;
+    }
+
+    section[data-testid="stSidebar"] .stRadio > label,
+    section[data-testid="stSidebar"] .stMultiSelect > label {
+        color: #8fa3bd !important;
+        font-size: 0.72rem;
+        font-weight: 800;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+    }
+
+    section[data-testid="stSidebar"] [data-testid="stRadio"] > label {
+        margin-bottom: 0.55rem;
+        color: #cbd8e8 !important;
+        font-size: 0.86rem;
+        letter-spacing: 0;
+        text-transform: none;
+    }
+
+    section[data-testid="stSidebar"] [data-testid="stRadio"] [role="radiogroup"] {
+        gap: 0.28rem;
+    }
+
+    section[data-testid="stSidebar"] [data-testid="stRadio"] [role="radio"] {
+        min-height: 2.35rem;
+        padding: 0.35rem 0.55rem;
+        border: 1px solid transparent;
+        border-radius: 10px;
+        transition: background 0.18s ease, border-color 0.18s ease;
+    }
+
+    section[data-testid="stSidebar"] [data-testid="stRadio"] [role="radio"]:hover {
+        background: rgba(96, 165, 250, 0.08);
+        border-color: rgba(96, 165, 250, 0.18);
+    }
+
+    section[data-testid="stSidebar"] [data-testid="stRadio"] [role="radio"][aria-checked="true"] {
+        background: linear-gradient(90deg, rgba(96, 165, 250, 0.18), rgba(34, 197, 94, 0.06));
+        border-color: rgba(96, 165, 250, 0.35);
+        box-shadow: inset 3px 0 0 #60a5fa;
+    }
+
+    section[data-testid="stSidebar"] [data-testid="stMultiSelect"] {
+        margin-bottom: 0.65rem;
+    }
+
+    section[data-testid="stSidebar"] [data-baseweb="select"] > div {
+        min-height: 2.55rem;
+        border-color: rgba(148, 163, 184, 0.2);
+        border-radius: 9px;
+        background: rgba(15, 27, 45, 0.82);
+    }
+
+    div[data-testid="stSidebarNav"] {
+        padding-top: 0.35rem;
+    }
+
+    div[data-testid="stSidebarNav"] a {
+        border-radius: 10px;
+        margin: 3px 0;
+        padding: 0.6rem 0.75rem;
+        transition: background 0.18s ease, border-color 0.18s ease;
+    }
+
+    div[data-testid="stSidebarNav"] a:hover {
+        background: rgba(148, 163, 184, 0.08);
+        border: 1px solid rgba(148, 163, 184, 0.16);
+    }
+
     .brand {
-        padding: 8px 4px 18px 4px;
-        border-bottom: 1px solid #263650;
+        padding: 10px 8px 18px 8px;
+        border-bottom: 1px solid rgba(148, 163, 184, 0.18);
         margin-bottom: 18px;
     }
-    .brand-name { font-size: 23px; font-weight: 800; letter-spacing: -.5px; }
-    .brand-sub { color:#8fa3bd; font-size:12px; margin-top:4px; }
+
+    .brand-name {
+        font-size: 24px;
+        font-weight: 800;
+        letter-spacing: -0.6px;
+        color: #f8fafc;
+    }
+
+    .brand-sub {
+        color: #8fa3bd;
+        font-size: 12px;
+        margin-top: 4px;
+        line-height: 1.5;
+    }
+
     .topbar {
-        display:flex; align-items:center; justify-content:space-between;
-        padding:18px 22px; margin:0 0 24px 0;
-        background: linear-gradient(135deg,#101d32,#0c1728);
-        border:1px solid #263650; border-radius:18px;
-        box-shadow:0 12px 35px rgba(0,0,0,.22);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 18px;
+        min-width: 0;
+        min-height: 88px;
+        padding: 18px 22px;
+        margin: 0 0 24px 0;
+        background: linear-gradient(135deg, #101d32 0%, #0d1728 100%);
+        border: 1px solid rgba(148, 163, 184, 0.18);
+        border-radius: 18px;
+        box-shadow: 0 12px 28px rgba(2, 6, 23, 0.22);
     }
-    .top-title { font-size:26px; font-weight:800; color:#f8fafc; }
-    .top-sub { font-size:13px; color:#91a4bd; margin-top:4px; }
+
+    .topbar-right {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        gap: 5px;
+    }
+
+    .top-title {
+        font-size: 27px;
+        font-weight: 800;
+        color: #f8fafc;
+        letter-spacing: -0.7px;
+    }
+
+    .top-sub {
+        font-size: 13px;
+        color: #9bb0c9;
+        margin-top: 4px;
+    }
+
+    .top-status-wrap {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        gap: 5px;
+    }
+
     .top-status {
-        padding:7px 12px; border:1px solid #28553f; border-radius:999px;
-        background:#0e2a20; color:#8ce3b1; font-size:12px; font-weight:700;
+        padding: 7px 12px;
+        border: 1px solid rgba(34, 197, 94, 0.35);
+        border-radius: 999px;
+        background: rgba(16, 185, 129, 0.08);
+        color: #96f0be;
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        white-space: nowrap;
     }
-    .page-head { margin: 4px 0 20px 0; }
-    .page-title { font-size:34px; font-weight:800; color:#f8fafc; letter-spacing:-.8px; }
-    .page-desc { color:#91a4bd; font-size:14px; margin-top:5px; }
+
+    .top-status-detail {
+        color: #8aa2bf;
+        font-size: 10px;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+        white-space: nowrap;
+    }
+
+    .top-page {
+        color: #dbeafe;
+        font-size: 12px;
+        font-weight: 800;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        white-space: nowrap;
+    }
+    }
+
+    .main-title {
+        font-size: 2.15rem;
+        font-weight: 800;
+        line-height: 1.2;
+        letter-spacing: -0.06em;
+        color: #f8fafc;
+        margin: 0.2rem 0 0.15rem 0;
+    }
+
+    .sub-title {
+        font-size: 0.98rem;
+        color: #9bb0c9;
+        margin-bottom: 0.5rem;
+        letter-spacing: 0.01em;
+    }
+
+    .premium-page-header {
+        position: relative;
+        padding: 1.15rem 1.2rem 0.9rem 1.2rem;
+        margin: 0.2rem 0 1.4rem 0;
+        border: 1px solid rgba(148, 163, 184, 0.16);
+        border-radius: 16px;
+        background: linear-gradient(135deg, rgba(15, 27, 45, 0.95), rgba(10, 18, 31, 0.9));
+        box-shadow: 0 10px 24px rgba(2, 6, 23, 0.12);
+        overflow: hidden;
+    }
+
+    .premium-page-header:before {
+        content: "";
+        position: absolute;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        width: 3px;
+        background: linear-gradient(180deg, #60a5fa, #22c55e);
+    }
+
+    .premium-page-title-row {
+        display: flex;
+        align-items: center;
+        gap: 0.8rem;
+        margin-bottom: 0.4rem;
+    }
+
+    .premium-page-icon {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 2.5rem;
+        height: 2.5rem;
+        border-radius: 12px;
+        background: rgba(96, 165, 250, 0.1);
+        border: 1px solid rgba(96, 165, 250, 0.18);
+        font-size: 1.3rem;
+    }
+
+    .premium-page-title {
+        font-size: clamp(1.7rem, 2vw, 2.6rem);
+        color: #f8fafc;
+        font-weight: 800;
+        letter-spacing: -0.07em;
+        line-height: 1.2;
+    }
+
+    .premium-page-subtitle {
+        color: #9bb0c9;
+        font-size: 0.98rem;
+        letter-spacing: 0.01em;
+        margin-left: 3.3rem;
+    }
+
+    .page-head {
+        margin: 0.2rem 0 1.25rem 0;
+    }
+
+    .page-title {
+        font-size: 34px;
+        font-weight: 800;
+        color: #f8fafc;
+        letter-spacing: -0.8px;
+    }
+
+    .page-desc {
+        color: #91a4bd;
+        font-size: 14px;
+        margin-top: 5px;
+    }
+
     .section-card {
-        background:#0f1b2d; border:1px solid #24344e; border-radius:16px;
-        padding:18px 20px; margin:10px 0 18px 0;
+        background: rgba(15, 27, 45, 0.92);
+        border: 1px solid rgba(148, 163, 184, 0.18);
+        border-radius: 16px;
+        padding: 18px 20px;
+        margin: 10px 0 18px 0;
+        box-shadow: 0 8px 24px rgba(2, 6, 23, 0.12);
     }
+
+    h1, h2, h3, h4, h5, h6 {
+        letter-spacing: -0.04em;
+        color: #f8fafc;
+    }
+
+    .stSubheader {
+        padding: 0.68rem 0.9rem;
+        margin: 0.9rem 0 0.8rem 0;
+        border: 1px solid rgba(148, 163, 184, 0.16);
+        border-left: 4px solid #60a5fa;
+        border-radius: 12px;
+        background: linear-gradient(135deg, rgba(15, 27, 45, 0.98), rgba(10, 18, 31, 0.88));
+        box-shadow: inset 0 1px 0 rgba(255,255,255,0.02);
+        color: #edf4ff !important;
+        font-weight: 700;
+        letter-spacing: -0.03em;
+        line-height: 1.35;
+    }
+
+    .stSubheader > div {
+        color: #edf4ff !important;
+    }
+
+    .stMarkdown h1,
+    .stMarkdown h2,
+    .stMarkdown h3,
+    .stMarkdown h4,
+    .stMarkdown h5,
+    .stMarkdown h6 {
+        margin: 0.9rem 0 0.8rem 0;
+        padding: 0.7rem 0.9rem;
+        border: 1px solid rgba(148, 163, 184, 0.16);
+        border-left: 4px solid #60a5fa;
+        border-radius: 12px;
+        background: linear-gradient(135deg, rgba(15, 27, 45, 0.98), rgba(10, 18, 31, 0.88));
+        color: #edf4ff !important;
+        font-weight: 700;
+        letter-spacing: -0.03em;
+        line-height: 1.35;
+        box-shadow: inset 0 1px 0 rgba(255,255,255,0.02);
+    }
+
     div[data-testid="stMetric"] {
-        background:linear-gradient(145deg,#111f34,#0d192b);
-        border:1px solid #263650; border-radius:14px; padding:16px 17px;
-        box-shadow:0 8px 22px rgba(0,0,0,.16);
+        background: linear-gradient(145deg, #111f34 0%, #0d192b 100%);
+        border: 1px solid rgba(148, 163, 184, 0.18);
+        border-radius: 14px;
+        padding: 16px 17px;
+        box-shadow: 0 8px 22px rgba(2, 6, 23, 0.18);
     }
-    div[data-testid="stMetric"] label { color:#91a4bd; font-size:12px; }
-    div[data-testid="stMetricValue"] { color:#f8fafc; font-weight:800; }
-    .stButton > button { border-radius:10px; border:1px solid #30415c; background:#132139; }
-    .stButton > button:hover { border-color:#6b7f9e; transform:translateY(-1px); }
-    div[data-testid="stDataFrame"] { border:1px solid #263650; border-radius:12px; overflow:hidden; }
+
+    div[data-testid="stMetric"] label {
+        color: #9bb0c9;
+        font-size: 12px;
+        font-weight: 600;
+    }
+
+    div[data-testid="stMetricValue"] {
+        color: #f8fafc;
+        font-weight: 800;
+        letter-spacing: -0.03em;
+    }
+
+    .stButton > button {
+        min-height: 2.35rem;
+        padding: 0.42rem 0.65rem;
+        border-radius: 999px;
+        border: 1px solid #30415c;
+        background: #132139;
+        color: #dbeafe;
+        font-size: 0.76rem;
+        white-space: nowrap;
+    }
+
+    .stButton > button:hover {
+        border-color: #6b7f9e;
+        transform: translateY(-1px);
+        box-shadow: 0 8px 16px rgba(15, 23, 42, 0.12);
+    }
+
+    div[data-testid="stDataFrame"] {
+        border: 1px solid rgba(148, 163, 184, 0.16);
+        border-radius: 12px;
+        overflow: hidden;
+        background: rgba(10, 18, 31, 0.65);
+    }
+
+    div[data-testid="stDataFrame"] > div {
+        border-radius: 12px;
+    }
+
+    .stAlert {
+        border-radius: 12px;
+        border: 1px solid rgba(148, 163, 184, 0.18);
+    }
+
+    div[data-testid="stChatMessage"] {
+        box-sizing: border-box;
+        max-width: 84%;
+        margin: 0.25rem 0 0.55rem 0;
+        padding: 0.72rem 0.95rem;
+        border: 1px solid #263650;
+        border-radius: 16px;
+        background: #0f1b2d;
+        color: #f8fafc !important;
+        line-height: 1.6;
+    }
+
+    div[data-testid="stChatMessage"] [data-testid="stMarkdownContainer"],
+    div[data-testid="stChatMessage"] [data-testid="stMarkdownContainer"] *,
+    div[data-testid="stChatMessage"] [data-testid="stMarkdownContainer"] p,
+    div[data-testid="stChatMessage"] [data-testid="stMarkdownContainer"] span,
+    div[data-testid="stChatMessage"] [data-testid="stMarkdownContainer"] strong {
+        color: #f8fafc !important;
+        font-size: 0.92rem;
+        line-height: 1.6;
+    }
+
+    div[data-testid="stChatMessage"]:has([data-testid="chatAvatarIcon-user"]),
+    div[data-testid="stChatMessage"]:has([data-testid="stChatMessageAvatarUser"]),
+    div[data-testid="stChatMessage"][aria-label*="user"] {
+        max-width: 75%;
+        margin-left: auto;
+        border-color: rgba(56, 189, 248, 0.34);
+        background: #111f34;
+    }
+
+    div[data-testid="stChatMessage"]:has([data-testid="chatAvatarIcon-assistant"]),
+    div[data-testid="stChatMessage"]:has([data-testid="stChatMessageAvatarAssistant"]),
+    div[data-testid="stChatMessage"][aria-label*="assistant"] {
+        max-width: 84%;
+        margin-right: auto;
+        border-color: rgba(148, 163, 184, 0.18);
+        background: #0f1b2d;
+    }
+
+    div[data-testid="stChatInput"] {
+        border: 1px solid #30415c !important;
+        border-radius: 15px;
+        background: #0f1b2d !important;
+        box-shadow: 0 10px 28px rgba(2, 6, 23, 0.2);
+    }
+
+    div[data-testid="stChatInput"] > div,
+    div[data-testid="stChatInput"] textarea,
+    div[data-testid="stChatInput"] input {
+        background: #0f1b2d !important;
+        border-color: #30415c !important;
+        color: #f8fafc !important;
+        caret-color: #7dd3fc;
+        font-size: 0.94rem;
+    }
+
+    div[data-testid="stChatInput"] textarea::placeholder,
+    div[data-testid="stChatInput"] input::placeholder {
+        color: #7f91a8 !important;
+        opacity: 1;
+    }
+
+    div[data-testid="stChatInput"]:focus-within {
+        border-color: #38bdf8 !important;
+        box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.1), 0 12px 30px rgba(2, 6, 23, 0.24);
+    }
+
+    .ai-page-shell {
+        width: 100%;
+        max-width: 1040px;
+        margin: 0 auto;
+    }
+
+    .ai-page-header {
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1.5rem;
+        padding: 1.35rem 1.5rem;
+        margin: 0.15rem 0 1rem 0;
+        overflow: hidden;
+        border: 1px solid rgba(96, 165, 250, 0.22);
+        border-radius: 18px;
+        background: linear-gradient(135deg, rgba(17, 31, 52, 0.98), rgba(10, 20, 36, 0.96));
+        box-shadow: 0 14px 32px rgba(2, 6, 23, 0.2);
+    }
+
+    .ai-page-header:before {
+        content: "";
+        position: absolute;
+        inset: 0 auto 0 0;
+        width: 3px;
+        background: linear-gradient(180deg, #60a5fa, #2dd4bf);
+    }
+
+    .ai-header-main {
+        min-width: 0;
+    }
+
+    .ai-header-title {
+        color: #f8fafc;
+        font-size: clamp(1.35rem, 2vw, 1.9rem);
+        font-weight: 800;
+        letter-spacing: -0.04em;
+        line-height: 1.2;
+    }
+
+    .ai-header-subtitle {
+        margin-top: 0.42rem;
+        color: #a7b7ca;
+        font-size: 0.9rem;
+        line-height: 1.5;
+    }
+
+    .ai-status {
+        flex: 0 0 auto;
+        padding: 0.5rem 0.72rem;
+        border: 1px solid rgba(45, 212, 191, 0.32);
+        border-radius: 999px;
+        background: rgba(45, 212, 191, 0.08);
+        color: #99f6e4;
+        font-size: 0.68rem;
+        font-weight: 800;
+        letter-spacing: 0.08em;
+        white-space: nowrap;
+    }
+
+    .ai-context-card {
+        padding: 0.8rem 1rem;
+        margin-bottom: 1.2rem;
+        border: 1px solid rgba(148, 163, 184, 0.16);
+        border-radius: 12px;
+        background: rgba(15, 27, 45, 0.74);
+    }
+
+    .ai-context-label {
+        color: #7f93ad;
+        font-size: 0.66rem;
+        font-weight: 800;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+    }
+
+    .ai-context-value {
+        margin-top: 0.35rem;
+        color: #dbeafe;
+        font-size: 0.84rem;
+        line-height: 1.5;
+    }
+
+    .ai-context-count {
+        color: #99f6e4;
+        font-weight: 800;
+    }
+
+    .ai-welcome-card {
+        padding: 1.65rem 1.5rem;
+        margin: 0.5rem 0 1.2rem 0;
+        text-align: center;
+        border: 1px solid rgba(96, 165, 250, 0.18);
+        border-radius: 16px;
+        background: linear-gradient(145deg, rgba(15, 27, 45, 0.88), rgba(10, 18, 31, 0.72));
+    }
+
+    .ai-welcome-icon {
+        font-size: 2rem;
+    }
+
+    .ai-welcome-title {
+        margin-top: 0.45rem;
+        color: #f8fafc;
+        font-size: 1.2rem;
+        font-weight: 800;
+    }
+
+    .ai-welcome-copy {
+        max-width: 560px;
+        margin: 0.5rem auto 0;
+        color: #a7b7ca;
+        font-size: 0.9rem;
+        line-height: 1.6;
+    }
+
+    .ai-section-label {
+        margin: 0.8rem 0 0.55rem;
+        color: #a7b7ca;
+        font-size: 0.72rem;
+        font-weight: 800;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+    }
+
+    .ai-suggestion-grid .stButton > button {
+        min-height: 2.35rem;
+        padding: 0.42rem 0.65rem;
+        border: 1px solid rgba(148, 163, 184, 0.2);
+        border-radius: 999px;
+        background: rgba(17, 31, 52, 0.88);
+        color: #dbeafe;
+        font-size: 0.76rem;
+        white-space: nowrap;
+    }
+
+    .ai-suggestion-grid .stButton > button:hover {
+        border-color: rgba(96, 165, 250, 0.62);
+        background: rgba(96, 165, 250, 0.12);
+        color: #f8fafc;
+        transform: translateY(-1px);
+    }
+
+    .ai-chat-area {
+        padding: 0.2rem 0;
+    }
+
+    .ai-chat-area div[data-testid="stChatMessage"] {
+        max-width: 88%;
+        padding: 0.72rem 0.9rem;
+        border-radius: 14px;
+        background: #0f1b2d;
+    }
+
+    .ai-chat-area div[data-testid="stChatMessage"] [data-testid="stMarkdownContainer"] {
+        color: #f8fafc !important;
+        font-size: 0.92rem;
+        line-height: 1.62;
+    }
+
+    .ai-chat-area div[data-testid="stChatMessage"] p {
+        color: #f8fafc !important;
+    }
+
+    @media (max-width: 800px) {
+        .ai-page-header {
+            align-items: flex-start;
+            flex-direction: column;
+            gap: 0.8rem;
+            padding: 1.1rem 1.15rem;
+        }
+
+        .ai-status {
+            font-size: 0.62rem;
+        }
+
+            div[data-testid="stChatMessage"],
+            div[data-testid="stChatMessage"]:has([data-testid="chatAvatarIcon-user"]),
+            div[data-testid="stChatMessage"]:has([data-testid="stChatMessageAvatarUser"]),
+            div[data-testid="stChatMessage"][aria-label*="user"],
+            div[data-testid="stChatMessage"]:has([data-testid="chatAvatarIcon-assistant"]),
+            div[data-testid="stChatMessage"]:has([data-testid="stChatMessageAvatarAssistant"]),
+            div[data-testid="stChatMessage"][aria-label*="assistant"] {
+                max-width: 100%;
+        }
+    }
+
     .footer {
-        margin-top:58px; padding:30px; border-radius:20px;
-        background:linear-gradient(135deg,#0f1c30,#0a1424);
-        border:1px solid #263650; box-shadow:0 -8px 30px rgba(0,0,0,.18);
+        margin-top: 58px;
+        padding: 30px;
+        border-radius: 20px;
+        background: linear-gradient(135deg, #0f1c30 0%, #0a1424 100%);
+        border: 1px solid rgba(148, 163, 184, 0.18);
+        box-shadow: 0 -8px 30px rgba(2, 6, 23, 0.15);
     }
-    .footer-grid { display:grid; grid-template-columns:1.5fr 1fr 1fr; gap:28px; }
-    .footer-brand { font-size:21px; font-weight:800; color:#f8fafc; }
-    .footer-heading { font-size:12px; text-transform:uppercase; letter-spacing:1px; color:#a7b7ca; font-weight:800; margin-bottom:10px; }
-    .footer-text { color:#8195ae; font-size:13px; line-height:1.7; }
-    .footer-pill { display:inline-block; padding:6px 10px; margin:3px; border:1px solid #30415c; border-radius:999px; color:#b8c6d8; font-size:11px; }
-    .footer-bottom { margin-top:24px; padding-top:17px; border-top:1px solid #263650; color:#687d98; font-size:11px; display:flex; justify-content:space-between; gap:10px; flex-wrap:wrap; }
-    @media (max-width: 800px) { .footer-grid { grid-template-columns:1fr; } .top-status { display:none; } .page-title { font-size:28px; } }
+
+    .footer-grid {
+        display: grid;
+        grid-template-columns: 1.5fr 1fr 1fr 1fr;
+        gap: 28px;
+    }
+
+    .footer-brand {
+        font-size: 21px;
+        font-weight: 800;
+        color: #f8fafc;
+        letter-spacing: -0.04em;
+    }
+
+    .footer-heading {
+        font-size: 12px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        color: #a7b7ca;
+        font-weight: 800;
+        margin-bottom: 10px;
+    }
+
+    .footer-text {
+        color: #8195ae;
+        font-size: 13px;
+        line-height: 1.7;
+    }
+
+    .footer-list {
+        margin: 0;
+        padding: 0;
+        list-style: none;
+        color: #8195ae;
+        font-size: 13px;
+        line-height: 1.9;
+    }
+
+    .footer-pill {
+        display: inline-block;
+        padding: 6px 10px;
+        margin: 3px;
+        border: 1px solid rgba(148, 163, 184, 0.2);
+        border-radius: 999px;
+        color: #c7d2e4;
+        font-size: 11px;
+        background: rgba(148, 163, 184, 0.04);
+    }
+
+    .footer-bottom {
+        margin-top: 24px;
+        padding-top: 17px;
+        border-top: 1px solid rgba(148, 163, 184, 0.2);
+        color: #7e90a8;
+        font-size: 11px;
+        display: flex;
+        justify-content: space-between;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+
+    @media (max-width: 1100px) {
+        .footer-grid {
+            grid-template-columns: 1.2fr 1fr 1fr;
+        }
+    }
+
+    @media (max-width: 800px) {
+        .footer-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .topbar {
+            padding: 16px 18px;
+            align-items: flex-start;
+            flex-direction: column;
+        }
+
+        .topbar-right {
+            align-items: flex-start;
+        }
+
+        .top-status-wrap {
+            align-items: flex-start;
+        }
+
+        .top-status {
+            display: none;
+        }
+
+        .top-title {
+            font-size: 22px;
+        }
+
+        .premium-page-title {
+            font-size: 1.8rem;
+        }
+
+        .premium-page-subtitle {
+            margin-left: 0;
+        }
+
+        .premium-page-title-row {
+            align-items: flex-start;
+        }
+
+        .main-title {
+            font-size: 1.75rem;
+        }
+
+        .page-title {
+            font-size: 28px;
+        }
+    }
     </style>
     """,
     unsafe_allow_html=True
@@ -172,7 +888,8 @@ page = st.sidebar.radio(
         "🤖 ML Analytics",
         "🚨 Anomaly Detection",
         "💡 Business Insights",
-        "⚙️ Data Quality"
+        "⚙️ Data Quality",
+        "🤖 AI Business Assistant"
     ]
 )
 
@@ -234,14 +951,24 @@ filtered_df = df[
 # APPLICATION TOP BAR
 # ============================================================
 
+filtered_record_count = len(filtered_df)
+filtered_order_count = filtered_df["order_id"].nunique()
+selected_filter_summary = (
+    f"{filtered_record_count:,} Records • {filtered_order_count:,} Orders"
+)
+
 st.markdown(
-    """
+    f"""
     <div class="topbar">
-        <div>
+        <div class="topbar-left">
             <div class="top-title">Smart Data Modernization</div>
-            <div class="top-sub">Enterprise Analytics • Customer Intelligence • Machine Learning</div>
+            <div class="top-sub">Analytics &amp; Intelligence Platform</div>
         </div>
-        <div class="top-status">● SYSTEM ONLINE</div>
+        <div class="topbar-right">
+            <div class="top-page">{page}</div>
+            <div class="top-status">● SYSTEM ONLINE</div>
+            <div class="top-status-detail">{selected_filter_summary}</div>
+        </div>
     </div>
     """,
     unsafe_allow_html=True
@@ -251,6 +978,21 @@ st.markdown(
 # ============================================================
 # HELPER FUNCTION
 # ============================================================
+
+def render_page_header(icon, title, subtitle):
+    st.markdown(
+        f"""
+        <div class="premium-page-header">
+            <div class="premium-page-title-row">
+                <span class="premium-page-icon">{icon}</span>
+                <span class="premium-page-title">{title}</span>
+            </div>
+            <div class="premium-page-subtitle">{subtitle}</div>
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
+
 
 def show_kpis(data):
 
@@ -304,6 +1046,123 @@ def show_kpis(data):
     )
 
 
+def answer_business_question(question, data):
+
+    normalized_question = question.strip().lower()
+
+    unsupported_response = (
+        "I can currently answer questions about sales, profit, orders, customers, "
+        "categories, regions, shipping, discounts and business performance.\n\n"
+        "Try: What is total sales?\n"
+        "Which region has the highest profit?\n"
+        "Who are the top 5 customers by profit?"
+    )
+
+    if data.empty:
+        return "There is no data available for the current filter selection."
+
+    def has_columns(*columns):
+        return all(column in data.columns for column in columns)
+
+    if "profit margin" in normalized_question:
+        if not has_columns("sales", "profit"):
+            return unsupported_response
+        total_sales = data["sales"].sum()
+        total_profit = data["profit"].sum()
+        profit_margin = (
+            (total_profit / total_sales) * 100
+            if total_sales != 0
+            else 0
+        )
+        return f"The profit margin for the current filtered data is **{profit_margin:.2f}%**."
+
+    ranking_requests = [
+        ("category", "profit", "category", "highest profit", "highest-profit category"),
+        ("category", "sales", "category", "highest sales", "highest-sales category"),
+        ("region", "profit", "region", "highest profit", "highest-profit region"),
+        ("region", "sales", "region", "highest sales", "highest-sales region"),
+        ("ship_mode", "sales", "shipping mode", "highest sales", "highest-sales shipping mode")
+    ]
+
+    for group_column, value_column, label, phrase, result_label in ranking_requests:
+        if (
+            (phrase in normalized_question or phrase.replace("highest", "most") in normalized_question)
+            and label in normalized_question
+        ):
+            if not has_columns(group_column, value_column):
+                return unsupported_response
+            ranking = data.groupby(group_column)[value_column].sum().sort_values(ascending=False)
+            if ranking.empty:
+                return unsupported_response
+            winner = ranking.index[0]
+            return (
+                f"🏆 **{winner}** is the {result_label}.\n\n"
+                f"Total {value_column.replace('_', ' ').title()}: **${ranking.iloc[0]:,.2f}**"
+            )
+
+    if "top customer" in normalized_question or "top customers" in normalized_question:
+        if not has_columns("customer_name", "profit"):
+            return unsupported_response
+        match = re.search(r"top\s+(\d+)", normalized_question)
+        top_count = int(match.group(1)) if match else 5
+        top_count = max(1, min(top_count, 10))
+        ranking = (
+            data.groupby("customer_name")["profit"]
+            .sum()
+            .sort_values(ascending=False)
+            .head(top_count)
+        )
+        if ranking.empty:
+            return unsupported_response
+        lines = [f"👥 **Top {len(ranking)} Customers by Profit**", ""]
+        lines.extend(
+            f"{index}. {customer} — **${profit:,.2f}**"
+            for index, (customer, profit) in enumerate(ranking.items(), start=1)
+        )
+        return "\n".join(lines)
+
+    if "loss-making" in normalized_question or "loss making" in normalized_question:
+        if not has_columns("sub_category", "profit"):
+            return unsupported_response
+        losses = data.groupby("sub_category")["profit"].sum()
+        losses = losses[losses < 0].sort_values()
+        if losses.empty:
+            return "No loss-making sub-categories were found in the current filtered data."
+        lines = ["⚠️ **Loss-Making Sub-Categories**", ""]
+        lines.extend(
+            f"- {subcategory} — **${profit:,.2f}**"
+            for subcategory, profit in losses.items()
+        )
+        return "\n".join(lines)
+
+    if "average discount" in normalized_question or "avg discount" in normalized_question:
+        if not has_columns("discount"):
+            return unsupported_response
+        return f"The average discount is **{data['discount'].mean():.2%}** for the current filtered data."
+
+    if "how many orders" in normalized_question or "number of orders" in normalized_question or "order count" in normalized_question:
+        if not has_columns("order_id"):
+            return unsupported_response
+        return f"There are **{data['order_id'].nunique():,} unique orders** in the current filtered data."
+
+    if "total quantity" in normalized_question or "quantity sold" in normalized_question or "how much quantity" in normalized_question:
+        if not has_columns("quantity"):
+            return unsupported_response
+        return f"The total quantity sold is **{data['quantity'].sum():,.0f} units**."
+
+    if "total sales" in normalized_question or "sales" in normalized_question or "revenue" in normalized_question:
+        if not has_columns("sales"):
+            return unsupported_response
+        return f"Total sales for the current filtered data are **${data['sales'].sum():,.2f}**."
+
+    if "total profit" in normalized_question or "profit" in normalized_question or "earnings" in normalized_question:
+        if not has_columns("profit"):
+            return unsupported_response
+        return f"Total profit for the current filtered data is **${data['profit'].sum():,.2f}**."
+
+    return unsupported_response
+
+
 # ============================================================
 # EMPTY FILTER CHECK
 # ============================================================
@@ -324,19 +1183,11 @@ if len(filtered_df) == 0:
 
 if page == "📊 Executive Dashboard":
 
-    st.markdown(
-        '<div class="main-title">📊 Smart Data Modernization</div>',
-        unsafe_allow_html=True
+    render_page_header(
+        "📊",
+        "Executive Dashboard",
+        "Interactive executive business analytics"
     )
-
-    st.markdown(
-        '<div class="sub-title">'
-        'Interactive Executive Business Dashboard'
-        '</div>',
-        unsafe_allow_html=True
-    )
-
-    st.divider()
 
     show_kpis(filtered_df)
 
@@ -441,15 +1292,11 @@ if page == "📊 Executive Dashboard":
 
 elif page == "📈 Sales Analytics":
 
-    st.title(
-        "📈 Sales Analytics"
-    )
-
-    st.caption(
+    render_page_header(
+        "📈",
+        "Sales Analytics",
         "Detailed sales, product and shipping analysis"
     )
-
-    st.divider()
 
     show_kpis(filtered_df)
 
@@ -716,15 +1563,11 @@ elif page == "📈 Sales Analytics":
 
 elif page == "👥 Customer Intelligence":
 
-    st.title(
-        "👥 Customer Intelligence"
-    )
-
-    st.caption(
+    render_page_header(
+        "👥",
+        "Customer Intelligence",
         "RFM segmentation, customer risk and clustering"
     )
-
-    st.divider()
 
     # ========================================================
     # RFM
@@ -1110,15 +1953,11 @@ elif page == "👥 Customer Intelligence":
 
 elif page == "🤖 ML Analytics":
 
-    st.title(
-        "🤖 Machine Learning Analytics"
-    )
-
-    st.caption(
+    render_page_header(
+        "🤖",
+        "Machine Learning Analytics",
         "Predictive modelling and forecasting"
     )
-
-    st.divider()
 
     # ========================================================
     # SALES PREDICTION
@@ -1261,15 +2100,11 @@ elif page == "🤖 ML Analytics":
 
 elif page == "🚨 Anomaly Detection":
 
-    st.title(
-        "🚨 Business Anomaly Detection"
-    )
-
-    st.caption(
+    render_page_header(
+        "🚨",
+        "Business Anomaly Detection",
         "Identify unusual discounts, shipping costs and transactions"
     )
-
-    st.divider()
 
     anomaly_file = (
         "data/anomalies.csv"
@@ -1411,15 +2246,11 @@ elif page == "🚨 Anomaly Detection":
 
 elif page == "💡 Business Insights":
 
-    st.title(
-        "💡 Business Intelligence"
-    )
-
-    st.caption(
+    render_page_header(
+        "💡",
+        "Business Intelligence",
         "Data-driven business insights from the selected filters"
     )
-
-    st.divider()
 
     # --------------------------------------------------------
     # BEST CATEGORY
@@ -1620,15 +2451,11 @@ elif page == "💡 Business Insights":
 
 elif page == "⚙️ Data Quality":
 
-    st.title(
-        "⚙️ Data Quality & Validation"
-    )
-
-    st.caption(
+    render_page_header(
+        "⚙️",
+        "Data Quality & Validation",
         "Monitor dataset health before analytics and ML"
     )
-
-    st.divider()
 
     total_rows = len(df)
 
@@ -1789,6 +2616,156 @@ elif page == "⚙️ Data Quality":
 
 
 # ============================================================
+# PAGE 8
+# AI BUSINESS ASSISTANT
+# ============================================================
+
+elif page == "🤖 AI Business Assistant":
+
+    years_context = (
+        "All Years"
+        if len(selected_years) == len(years)
+        else ", ".join(str(year) for year in selected_years)
+    )
+    categories_context = (
+        "All Categories"
+        if len(selected_categories) == len(categories)
+        else ", ".join(selected_categories)
+    )
+    regions_context = (
+        "All Regions"
+        if len(selected_regions) == len(regions)
+        else ", ".join(selected_regions)
+    )
+
+    assistant_column, _ = st.columns([8, 1])
+
+    with assistant_column:
+        st.markdown(
+            """
+            <div class="ai-page-shell">
+                <div class="ai-page-header">
+                    <div class="ai-header-main">
+                        <div class="ai-header-title">🤖 AI Business Assistant</div>
+                        <div class="ai-header-subtitle">
+                            Your intelligent assistant for business analytics and data-driven decisions.
+                        </div>
+                    </div>
+                    <div class="ai-status">● AI ASSISTANT ONLINE</div>
+                </div>
+                <div class="ai-context-card">
+                    <div class="ai-context-label">Current Data Context</div>
+                    <div class="ai-context-value">
+                        FILTERS: {years_context} &nbsp;•&nbsp; {categories_context} &nbsp;•&nbsp; {regions_context}
+                        <br>
+                        <span class="ai-context-count">{record_count:,} Records</span>
+                        &nbsp;•&nbsp; {order_count:,} Orders
+                    </div>
+                </div>
+            </div>
+            """.format(
+                years_context=years_context,
+                categories_context=categories_context,
+                regions_context=regions_context,
+                record_count=len(filtered_df),
+                order_count=filtered_df["order_id"].nunique()
+            ),
+            unsafe_allow_html=True
+        )
+
+    if "business_assistant_messages" not in st.session_state:
+        st.session_state.business_assistant_messages = [
+            {
+                "role": "assistant",
+                "content": (
+                    "Hello. Ask me about sales, profit, orders, quantity, "
+                    "profit margin, or category performance."
+                )
+            }
+        ]
+
+    with assistant_column:
+        if len(st.session_state.business_assistant_messages) == 1:
+            st.markdown(
+                """
+                <div class="ai-welcome-card">
+                    <div class="ai-welcome-icon">🤖</div>
+                    <div class="ai-welcome-title">AI Business Assistant</div>
+                    <div class="ai-welcome-copy">
+                        Ask questions about your sales, customers, profitability,
+                        regions and business performance.
+                    </div>
+                </div>
+                """,
+                unsafe_allow_html=True
+            )
+
+        st.markdown(
+            '<div class="ai-section-label">Suggested Questions</div>',
+            unsafe_allow_html=True
+        )
+
+        suggestions = [
+            ("💰 Total Sales", "What is the total sales?"),
+            ("📈 Total Profit", "What is the total profit?"),
+            ("📦 Quantity Sold", "What is the total quantity sold?"),
+            ("🛒 Order Count", "How many orders are there?"),
+            ("📊 Profit Margin", "What is the profit margin?"),
+            ("🏆 Best Category", "Which category has the highest profit?"),
+            ("📦 Best Sales Category", "Which category has the highest sales?"),
+            ("🌍 Best Profit Region", "Which region has the highest profit?"),
+            ("🌍 Best Sales Region", "Which region has the highest sales?"),
+            ("👥 Top Customers", "Who are the top 5 customers by profit?"),
+            ("⚠️ Loss Categories", "Which sub-categories are loss-making?"),
+            ("🚚 Best Shipping", "Which shipping mode has the highest sales?"),
+            ("🏷️ Average Discount", "What is the average discount?")
+        ]
+
+        suggestion_columns = st.columns(4)
+        selected_suggestion = None
+
+        for index, (label, prompt) in enumerate(suggestions):
+            with suggestion_columns[index % 4]:
+                if st.button(label, key=f"assistant_suggestion_{index}", use_container_width=True):
+                    selected_suggestion = prompt
+
+        for message in st.session_state.business_assistant_messages:
+            with st.chat_message(message["role"]):
+                st.markdown(message["content"])
+
+        question = st.chat_input(
+            "Ask anything about your business data..."
+        )
+
+        question = question or selected_suggestion
+
+    if question:
+        answer = answer_business_question(
+            question,
+            filtered_df
+        )
+
+        st.session_state.business_assistant_messages.extend(
+            [
+                {
+                    "role": "user",
+                    "content": question
+                },
+                {
+                    "role": "assistant",
+                    "content": answer
+                }
+            ]
+        )
+
+        with st.chat_message("user"):
+            st.markdown(question)
+
+        with st.chat_message("assistant"):
+            st.markdown(answer)
+
+
+# ============================================================
 # PREMIUM PRODUCT FOOTER
 # ============================================================
 
@@ -1799,19 +2776,31 @@ st.markdown(
             <div>
                 <div class="footer-brand">📊 Smart Data Modernization</div>
                 <div class="footer-text" style="margin-top:10px;">
-                    An end-to-end analytics platform that converts business data
-                    into measurable insights, customer intelligence and predictive decisions.
+                    An end-to-end analytics platform that converts business data into measurable insights,
+                    customer intelligence, and predictive decisions.
                 </div>
             </div>
             <div>
                 <div class="footer-heading">Platform</div>
-                <div class="footer-text">
-                    Executive Analytics<br>
-                    Sales Intelligence<br>
-                    Customer Intelligence<br>
-                    ML & Forecasting<br>
-                    Anomaly Monitoring
-                </div>
+                <ul class="footer-list">
+                    <li>Executive Analytics</li>
+                    <li>Sales Intelligence</li>
+                    <li>Customer Intelligence</li>
+                    <li>ML & Forecasting</li>
+                    <li>Anomaly Monitoring</li>
+                    <li>Data Quality</li>
+                </ul>
+            </div>
+            <div>
+                <div class="footer-heading">Analytics</div>
+                <ul class="footer-list">
+                    <li>Revenue Analysis</li>
+                    <li>Profit Analysis</li>
+                    <li>Customer Segmentation</li>
+                    <li>Risk Prediction</li>
+                    <li>Sales Forecasting</li>
+                    <li>Business Insights</li>
+                </ul>
             </div>
             <div>
                 <div class="footer-heading">Technology</div>
@@ -1821,12 +2810,14 @@ st.markdown(
                     <span class="footer-pill">Scikit-Learn</span>
                     <span class="footer-pill">Streamlit</span>
                     <span class="footer-pill">Machine Learning</span>
+                    <span class="footer-pill">Data Analytics</span>
                 </div>
             </div>
         </div>
         <div class="footer-bottom">
-            <span>Smart Data Modernization</span>
-            <span>Data → Insights → Intelligence</span>
+            <span>© 2026 Smart Data Modernization</span>
+            <span>Data → Insights → Intelligence → Decisions</span>
+            <span>Enterprise Analytics Platform</span>
         </div>
     </div>
     """,
