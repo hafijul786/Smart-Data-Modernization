@@ -2,6 +2,7 @@ import streamlit as st
 import pandas as pd
 import os
 import re
+import io
 
 # ============================================================
 # PAGE CONFIGURATION
@@ -651,6 +652,66 @@ st.markdown(
         color: #f8fafc !important;
     }
 
+    .upload-intro {
+        padding: 1.15rem 1.25rem;
+        margin-bottom: 1rem;
+        border: 1px solid rgba(96, 165, 250, 0.2);
+        border-radius: 15px;
+        background: linear-gradient(135deg, rgba(17, 31, 52, 0.95), rgba(10, 20, 36, 0.9));
+    }
+
+    .upload-intro-title {
+        color: #f8fafc;
+        font-size: 1rem;
+        font-weight: 800;
+    }
+
+    .upload-intro-copy {
+        margin-top: 0.35rem;
+        color: #a7b7ca;
+        font-size: 0.88rem;
+        line-height: 1.55;
+    }
+
+    .upload-context-card {
+        padding: 0.9rem 1rem;
+        margin: 0.6rem 0 1rem;
+        border: 1px solid rgba(52, 211, 153, 0.22);
+        border-radius: 12px;
+        background: rgba(16, 185, 129, 0.06);
+    }
+
+    .upload-context-label {
+        color: #6ee7b7;
+        font-size: 0.68rem;
+        font-weight: 800;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+    }
+
+    .upload-context-value {
+        margin-top: 0.35rem;
+        color: #d1fae5;
+        font-size: 0.86rem;
+    }
+
+    .upload-section-title {
+        margin: 1.25rem 0 0.7rem;
+        padding: 0.62rem 0.8rem;
+        border-left: 4px solid #38bdf8;
+        border-radius: 9px;
+        background: rgba(15, 27, 45, 0.85);
+        color: #f8fafc;
+        font-size: 0.98rem;
+        font-weight: 800;
+    }
+
+    @media (max-width: 800px) {
+        .upload-section-title {
+            margin-top: 1rem;
+        }
+    }
+
     @media (max-width: 800px) {
         .ai-page-header {
             align-items: flex-start;
@@ -889,7 +950,8 @@ page = st.sidebar.radio(
         "🚨 Anomaly Detection",
         "💡 Business Insights",
         "⚙️ Data Quality",
-        "🤖 AI Business Assistant"
+        "🤖 AI Business Assistant",
+        "📂 Upload Business Data"
     ]
 )
 
@@ -1163,11 +1225,95 @@ def answer_business_question(question, data):
     return unsupported_response
 
 
+UPLOAD_REQUIRED_COLUMNS = [
+    "order_id",
+    "order_date",
+    "ship_date",
+    "ship_mode",
+    "customer_name",
+    "category",
+    "sub_category",
+    "sales",
+    "quantity",
+    "discount",
+    "profit",
+    "shipping_cost",
+    "region"
+]
+
+
+def prepare_uploaded_data(uploaded_file):
+
+    try:
+        uploaded_data = pd.read_csv(
+            io.BytesIO(uploaded_file.getvalue())
+            if hasattr(uploaded_file, "getvalue")
+            else io.BytesIO(uploaded_file)
+        )
+    except Exception as error:
+        return None, [], 0, 0, f"Could not read the uploaded CSV: {error}"
+
+    if uploaded_data.empty:
+        return None, [], 0, 0, "The uploaded CSV is empty."
+
+    missing_columns = [
+        column
+        for column in UPLOAD_REQUIRED_COLUMNS
+        if column not in uploaded_data.columns
+    ]
+
+    if missing_columns:
+        return None, missing_columns, 0, 0, None
+
+    cleaned_data = uploaded_data.copy()
+
+    cleaned_data["order_date"] = pd.to_datetime(
+        cleaned_data["order_date"],
+        errors="coerce"
+    )
+    cleaned_data["ship_date"] = pd.to_datetime(
+        cleaned_data["ship_date"],
+        errors="coerce"
+    )
+
+    numeric_columns = [
+        "sales",
+        "profit",
+        "quantity",
+        "discount",
+        "shipping_cost"
+    ]
+
+    for column in numeric_columns:
+        cleaned_data[column] = pd.to_numeric(
+            cleaned_data[column],
+            errors="coerce"
+        )
+
+    invalid_row_mask = cleaned_data[
+        UPLOAD_REQUIRED_COLUMNS
+    ].isnull().any(axis=1)
+    invalid_row_count = int(invalid_row_mask.sum())
+    cleaned_data = cleaned_data.loc[~invalid_row_mask].copy()
+
+    duplicate_row_count = int(cleaned_data.duplicated().sum())
+    cleaned_data = cleaned_data.drop_duplicates().copy()
+    cleaned_data["year"] = cleaned_data["order_date"].dt.year
+
+    return (
+        cleaned_data,
+        [],
+        invalid_row_count,
+        duplicate_row_count,
+        None
+    )
+
+
 # ============================================================
 # EMPTY FILTER CHECK
 # ============================================================
 
-if len(filtered_df) == 0:
+if len(filtered_df) == 0 and page != "📂 Upload Business Data":
 
     st.warning(
         "No records found for the selected filters."
@@ -2622,6 +2768,11 @@ elif page == "⚙️ Data Quality":
 
 elif page == "🤖 AI Business Assistant":
 
+    assistant_data = st.session_state.get(
+        "uploaded_assistant_data",
+        filtered_df
+    )
+
     years_context = (
         "All Years"
         if len(selected_years) == len(years)
@@ -2667,8 +2818,8 @@ elif page == "🤖 AI Business Assistant":
                 years_context=years_context,
                 categories_context=categories_context,
                 regions_context=regions_context,
-                record_count=len(filtered_df),
-                order_count=filtered_df["order_id"].nunique()
+                record_count=len(assistant_data),
+                order_count=assistant_data["order_id"].nunique()
             ),
             unsafe_allow_html=True
         )
@@ -2742,7 +2893,7 @@ elif page == "🤖 AI Business Assistant":
     if question:
         answer = answer_business_question(
             question,
-            filtered_df
+            assistant_data
         )
 
         st.session_state.business_assistant_messages.extend(
@@ -2763,6 +2914,240 @@ elif page == "🤖 AI Business Assistant":
 
         with st.chat_message("assistant"):
             st.markdown(answer)
+
+
+# ============================================================
+# PAGE 9
+# UPLOAD BUSINESS DATA
+# ============================================================
+
+elif page == "📂 Upload Business Data":
+
+    render_page_header(
+        "📂",
+        "Upload Business Data",
+        "Analyze your own sales data with the Smart Data Modernization platform"
+    )
+
+    st.markdown(
+        """
+        <div class="upload-intro">
+            <div class="upload-intro-title">Bring your business data into the platform</div>
+            <div class="upload-intro-copy">
+                Upload a CSV containing your business sales data to analyze it using the
+                Smart Data Modernization platform. The original uploaded file is never modified.
+            </div>
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
+
+    uploaded_file = st.file_uploader(
+        "Upload your business CSV file",
+        type=["csv"],
+        key="business_data_uploader"
+    )
+
+    if uploaded_file is not None:
+        (
+            prepared_data,
+            missing_columns,
+            invalid_row_count,
+            duplicate_row_count,
+            upload_error
+        ) = prepare_uploaded_data(uploaded_file)
+
+        st.session_state.uploaded_business_data = prepared_data
+        st.session_state.uploaded_business_data_missing = missing_columns
+        st.session_state.uploaded_business_data_error = upload_error
+        st.session_state.uploaded_business_data_quality = (
+            invalid_row_count,
+            duplicate_row_count
+        )
+        if prepared_data is None:
+            st.session_state.uploaded_assistant_data = None
+
+    uploaded_data = st.session_state.get("uploaded_business_data")
+    missing_columns = st.session_state.get("uploaded_business_data_missing", [])
+    upload_error = st.session_state.get("uploaded_business_data_error")
+    invalid_row_count, duplicate_row_count = st.session_state.get(
+        "uploaded_business_data_quality",
+        (0, 0)
+    )
+
+    if upload_error:
+        st.error(upload_error)
+
+    if missing_columns:
+        st.error(
+            "⚠️ Invalid dataset structure. Please upload a CSV with the required business columns."
+        )
+        st.write("Missing columns: " + ", ".join(missing_columns))
+
+    if uploaded_data is None:
+        st.info(
+            "No uploaded dataset is active. Your existing Superstore dashboard remains unchanged."
+        )
+    elif uploaded_data.empty:
+        st.warning("No valid rows remain after cleaning the uploaded CSV.")
+    else:
+        st.success(
+            f"Uploaded dataset validated: {len(uploaded_data):,} usable records."
+        )
+
+        if invalid_row_count or duplicate_row_count:
+            st.caption(
+                f"Cleaning summary: {invalid_row_count:,} invalid rows handled, "
+                f"{duplicate_row_count:,} duplicate rows removed."
+            )
+
+        upload_years = sorted(uploaded_data["year"].dropna().unique().tolist())
+        upload_categories = sorted(uploaded_data["category"].dropna().unique().tolist())
+        upload_regions = sorted(uploaded_data["region"].dropna().unique().tolist())
+        upload_ship_modes = sorted(uploaded_data["ship_mode"].dropna().unique().tolist())
+
+        st.markdown(
+            '<div class="upload-section-title">🔎 Uploaded Data Filters</div>',
+            unsafe_allow_html=True
+        )
+
+        filter_col1, filter_col2, filter_col3, filter_col4 = st.columns(4)
+
+        with filter_col1:
+            selected_upload_years = st.multiselect(
+                "Year",
+                upload_years,
+                default=upload_years,
+                key="uploaded_year_filter"
+            )
+        with filter_col2:
+            selected_upload_categories = st.multiselect(
+                "Category",
+                upload_categories,
+                default=upload_categories,
+                key="uploaded_category_filter"
+            )
+        with filter_col3:
+            selected_upload_regions = st.multiselect(
+                "Region",
+                upload_regions,
+                default=upload_regions,
+                key="uploaded_region_filter"
+            )
+        with filter_col4:
+            selected_upload_ship_modes = st.multiselect(
+                "Ship Mode",
+                upload_ship_modes,
+                default=upload_ship_modes,
+                key="uploaded_ship_mode_filter"
+            )
+
+        uploaded_filtered_data = uploaded_data[
+            uploaded_data["year"].isin(selected_upload_years)
+            & uploaded_data["category"].isin(selected_upload_categories)
+            & uploaded_data["region"].isin(selected_upload_regions)
+            & uploaded_data["ship_mode"].isin(selected_upload_ship_modes)
+        ].copy()
+
+        st.session_state.uploaded_assistant_data = uploaded_filtered_data
+
+        if uploaded_filtered_data.empty:
+            st.warning("No uploaded records match the current filters.")
+        else:
+            upload_total_sales = uploaded_filtered_data["sales"].sum()
+            upload_total_profit = uploaded_filtered_data["profit"].sum()
+            upload_total_orders = uploaded_filtered_data["order_id"].nunique()
+            upload_total_quantity = uploaded_filtered_data["quantity"].sum()
+            upload_total_customers = uploaded_filtered_data["customer_name"].nunique()
+            upload_profit_margin = (
+                (upload_total_profit / upload_total_sales) * 100
+                if upload_total_sales != 0
+                else 0
+            )
+
+            st.markdown(
+                '<div class="upload-section-title">📊 Uploaded Business Data Overview</div>',
+                unsafe_allow_html=True
+            )
+
+            kpi_columns = st.columns(6)
+            kpi_columns[0].metric("💰 Total Sales", f"${upload_total_sales:,.0f}")
+            kpi_columns[1].metric("📈 Total Profit", f"${upload_total_profit:,.0f}")
+            kpi_columns[2].metric("🛒 Total Orders", f"{upload_total_orders:,}")
+            kpi_columns[3].metric("📦 Total Quantity", f"{upload_total_quantity:,.0f}")
+            kpi_columns[4].metric("📊 Profit Margin", f"{upload_profit_margin:.2f}%")
+            kpi_columns[5].metric("👥 Total Customers", f"{upload_total_customers:,}")
+
+            st.markdown(
+                '<div class="upload-section-title">📈 Uploaded Data Analytics</div>',
+                unsafe_allow_html=True
+            )
+
+            trend_data = (
+                uploaded_filtered_data.assign(
+                    month=uploaded_filtered_data["order_date"].dt.to_period("M").astype(str)
+                )
+                .groupby("month")["sales"]
+                .sum()
+            )
+            category_sales = uploaded_filtered_data.groupby("category")["sales"].sum()
+            category_profit = uploaded_filtered_data.groupby("category")["profit"].sum()
+            region_sales = uploaded_filtered_data.groupby("region")["sales"].sum()
+            region_profit = uploaded_filtered_data.groupby("region")["profit"].sum()
+            top_customers = (
+                uploaded_filtered_data.groupby("customer_name")["profit"]
+                .sum()
+                .sort_values(ascending=False)
+                .head(10)
+            )
+            loss_subcategories = (
+                uploaded_filtered_data.groupby("sub_category")["profit"]
+                .sum()
+            )
+            loss_subcategories = loss_subcategories[loss_subcategories < 0].sort_values()
+
+            chart_col1, chart_col2 = st.columns(2)
+            with chart_col1:
+                st.subheader("📅 Sales Trend")
+                st.line_chart(trend_data)
+                st.subheader("📦 Sales by Category")
+                st.bar_chart(category_sales)
+                st.subheader("🌍 Sales by Region")
+                st.bar_chart(region_sales)
+            with chart_col2:
+                st.subheader("📦 Profit by Category")
+                st.bar_chart(category_profit)
+                st.subheader("🌍 Profit by Region")
+                st.bar_chart(region_profit)
+                st.subheader("👥 Top 10 Customers by Profit")
+                st.bar_chart(top_customers)
+
+            st.subheader("⚠️ Loss-Making Sub-Categories")
+            if loss_subcategories.empty:
+                st.success("No loss-making sub-categories found in the current filtered data.")
+            else:
+                st.bar_chart(loss_subcategories)
+
+            st.markdown(
+                '<div class="upload-section-title">💡 Business Insights</div>',
+                unsafe_allow_html=True
+            )
+
+            best_category = category_profit.idxmax()
+            best_region = region_profit.idxmax()
+            lowest_category = category_profit.idxmin()
+            customer_sales = uploaded_filtered_data.groupby("customer_name")["sales"].sum()
+            majority_customer_count = int(
+                (customer_sales.sort_values(ascending=False).cumsum()
+                 <= customer_sales.sum() * 0.8).sum()
+            )
+
+            st.markdown(
+                f"- **{best_category}** generated the highest profit.\n"
+                f"- **{best_region}** generated the highest profit by region.\n"
+                f"- **{lowest_category}** has the lowest profit among categories.\n"
+                f"- The top **{majority_customer_count:,} customers** generated approximately 80% of sales."
+            )
 
 
 # ============================================================
