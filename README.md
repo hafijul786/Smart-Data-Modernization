@@ -1,5 +1,13 @@
 # 📊 Smart Data Modernization
 
+> Enterprise Analytics • Customer Intelligence • Machine Learning
+
+## 🚀 Live Demo
+
+👉 **[View Live Dashboard](https://hafijul786-smart-data-modernization-dashboardapp-ld5qqw.streamlit.app/)**
+
+ 📊 Smart Data Modernization
+
 > An end-to-end Enterprise Analytics and Business Intelligence platform that transforms raw business data into meaningful insights, customer intelligence, predictive analytics, anomaly detection, and smarter business decisions.
 
 ---
