@@ -706,6 +706,169 @@ st.markdown(
         font-weight: 800;
     }
 
+    .validation-banner {
+        display: flex;
+        flex-direction: column;
+        gap: 0.35rem;
+        padding: 1rem 1.2rem;
+        margin: 1rem 0 1.25rem;
+        border: 1px solid rgba(16, 185, 129, 0.38);
+        border-radius: 14px;
+        background: linear-gradient(135deg, rgba(11, 52, 42, 0.95), rgba(10, 23, 34, 0.92));
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+    }
+
+    .validation-banner-title {
+        color: #d1fae5;
+        font-size: 1.02rem;
+        font-weight: 800;
+        letter-spacing: -0.02em;
+    }
+
+    .validation-banner-subtitle {
+        color: #ecfdf5;
+        font-size: 0.92rem;
+        font-weight: 600;
+    }
+
+    .dataset-overview-card {
+        padding: 1.15rem 1.15rem 1rem;
+        margin: 1.2rem 0 1.1rem;
+        border: 1px solid rgba(148, 163, 184, 0.22);
+        border-radius: 18px;
+        background: linear-gradient(180deg, rgba(16, 28, 42, 0.96), rgba(11, 20, 31, 0.9));
+        box-shadow: 0 12px 30px rgba(2, 6, 23, 0.18);
+    }
+
+    .dataset-overview-header {
+        margin: 0 0 1rem;
+        color: #f8fafc;
+        font-size: 1.05rem;
+        font-weight: 800;
+        letter-spacing: -0.02em;
+    }
+
+    .dataset-metric-grid {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 0.9rem;
+    }
+
+    .dataset-metric-card {
+        min-height: 122px;
+        padding: 1rem 1rem 0.9rem;
+        border: 1px solid rgba(148, 163, 184, 0.18);
+        border-radius: 14px;
+        background: linear-gradient(180deg, rgba(15, 27, 45, 0.95), rgba(12, 19, 29, 0.92));
+        transition: transform 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease;
+    }
+
+    .dataset-metric-card:hover {
+        transform: translateY(-1px);
+        border-color: rgba(96, 165, 250, 0.42);
+        box-shadow: 0 8px 18px rgba(59, 130, 246, 0.12);
+    }
+
+    .dataset-metric-card.warning {
+        border-color: rgba(251, 191, 36, 0.38);
+        background: linear-gradient(180deg, rgba(55, 36, 11, 0.88), rgba(19, 21, 30, 0.9));
+    }
+
+    .dataset-metric-card.healthy {
+        border-color: rgba(16, 185, 129, 0.34);
+        background: linear-gradient(180deg, rgba(8, 42, 34, 0.9), rgba(12, 19, 29, 0.92));
+    }
+
+    .dataset-metric-label {
+        color: #cfe1f5;
+        font-size: 0.74rem;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+    }
+
+    .dataset-metric-value {
+        margin-top: 0.8rem;
+        color: #f8fafc;
+        font-size: clamp(1.3rem, 1.6vw, 2rem);
+        font-weight: 800;
+        letter-spacing: -0.04em;
+        line-height: 1.2;
+        word-break: break-word;
+    }
+
+    .dataset-metric-footnote {
+        margin-top: 0.55rem;
+        color: #8db2d5;
+        font-size: 0.73rem;
+        font-weight: 600;
+    }
+
+    .dataset-columns-card {
+        padding: 1.1rem 1.1rem 1rem;
+        margin-top: 0.2rem;
+        border: 1px solid rgba(148, 163, 184, 0.2);
+        border-radius: 16px;
+        background: linear-gradient(180deg, rgba(12, 22, 35, 0.95), rgba(11, 18, 29, 0.9));
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.02);
+    }
+
+    .dataset-columns-header {
+        margin: 0 0 0.8rem;
+        color: #f8fafc;
+        font-size: 1rem;
+        font-weight: 800;
+    }
+
+    .dataset-column-pills {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.55rem;
+    }
+
+    .dataset-column-pill {
+        display: inline-flex;
+        align-items: center;
+        max-width: 100%;
+        padding: 0.52rem 0.7rem;
+        border: 1px solid rgba(96, 165, 250, 0.22);
+        border-radius: 999px;
+        background: rgba(23, 38, 57, 0.92);
+        color: #e2f0ff;
+        font-size: 0.82rem;
+        font-weight: 600;
+        line-height: 1.3;
+        white-space: normal;
+        word-break: break-word;
+    }
+
+    .muted-caption {
+        margin-top: 0.8rem;
+        color: #9bb0c9;
+        font-size: 0.82rem;
+        line-height: 1.55;
+    }
+
+    @media (max-width: 900px) {
+        .dataset-metric-grid {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+    }
+
+    @media (max-width: 560px) {
+        .dataset-metric-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .dataset-column-pill {
+            font-size: 0.76rem;
+        }
+
+        .validation-banner {
+            padding: 0.9rem 1rem;
+        }
+    }
+
     @media (max-width: 800px) {
         .upload-section-title {
             margin-top: 1rem;
@@ -1225,86 +1388,823 @@ def answer_business_question(question, data):
     return unsupported_response
 
 
-UPLOAD_REQUIRED_COLUMNS = [
-    "order_id",
-    "order_date",
-    "ship_date",
-    "ship_mode",
-    "customer_name",
-    "category",
-    "sub_category",
-    "sales",
+STANDARD_FIELD_ORDER = [
+    "date",
+    "revenue",
     "quantity",
-    "discount",
     "profit",
-    "shipping_cost",
-    "region"
+    "product",
+    "category",
+    "customer",
+    "location",
+    "order",
+    "status",
+    "channel",
+    "discount",
+    "cost"
+]
+
+BUSINESS_SEMANTIC_ALIASES = {
+    "date": {
+        "date",
+        "order date",
+        "order_date",
+        "transaction date",
+        "transaction_date",
+        "purchase date",
+        "purchase_date",
+        "sale date",
+        "sale_date",
+        "created at",
+        "created_at",
+        "timestamp",
+        "time"
+    },
+    "revenue": {
+        "revenue",
+        "sales",
+        "sale",
+        "amount",
+        "total amount",
+        "total_amount",
+        "income",
+        "turnover",
+        "gmv",
+        "total sales",
+        "total_sales",
+        "gross sales",
+        "gross_sales",
+        "net sales",
+        "net_sales"
+    },
+    "quantity": {
+        "quantity",
+        "qty",
+        "units",
+        "units sold",
+        "units_sold",
+        "items",
+        "item count",
+        "item_count",
+        "count"
+    },
+    "profit": {
+        "profit",
+        "net profit",
+        "net_profit",
+        "gross profit",
+        "gross_profit",
+        "earnings",
+        "margin",
+        "net earnings",
+        "net_earnings"
+    },
+    "product": {
+        "product",
+        "product name",
+        "product_name",
+        "item",
+        "item name",
+        "item_name",
+        "sku",
+        "product title",
+        "product_title"
+    },
+    "category": {
+        "category",
+        "product category",
+        "product_category",
+        "type",
+        "segment",
+        "department"
+    },
+    "customer": {
+        "customer",
+        "customer name",
+        "customer_name",
+        "buyer",
+        "client",
+        "user",
+        "account",
+        "shopper"
+    },
+    "location": {
+        "location",
+        "city",
+        "state",
+        "country",
+        "region",
+        "area",
+        "store",
+        "market",
+        "territory"
+    },
+    "order": {
+        "order id",
+        "order_id",
+        "transaction id",
+        "transaction_id",
+        "invoice",
+        "invoice id",
+        "invoice_id",
+        "order number",
+        "order_number",
+        "order no",
+        "orderno"
+    },
+    "status": {
+        "status",
+        "order status",
+        "order_status",
+        "payment status",
+        "payment_status",
+        "delivery status",
+        "delivery_status",
+        "fulfilment",
+        "fulfillment"
+    },
+    "channel": {
+        "channel",
+        "sales channel",
+        "sales_channel",
+        "platform",
+        "source",
+        "marketplace",
+        "store channel"
+    },
+    "discount": {
+        "discount",
+        "discount rate",
+        "discount_rate",
+        "discount percentage",
+        "discount_percentage",
+        "promotion",
+        "promo"
+    },
+    "cost": {
+        "cost",
+        "shipping cost",
+        "shipping_cost",
+        "delivery cost",
+        "delivery_cost",
+        "freight",
+        "shipping",
+        "logistics cost",
+        "logistics_cost"
+    }
+}
+
+DATASET_CLASSIFIERS = [
+    ("Retail", {"product", "category", "revenue"}),
+    ("E-commerce", {"channel", "product", "revenue"}),
+    ("Sales", {"revenue", "customer"}),
+    ("Customer Transactions", {"customer", "order", "date"}),
+    ("Inventory", {"product", "quantity", "category"}),
+    ("Marketing", {"channel", "revenue", "customer"}),
+    ("Finance", {"revenue", "profit", "cost"}),
+    ("Operations", {"status", "location", "date"})
 ]
 
 
-def prepare_uploaded_data(uploaded_file):
+def normalize_business_column_name(value):
+    if value is None:
+        return ""
+    text = str(value).strip().lower()
+    text = re.sub(r"[^a-z0-9]+", " ", text)
+    return " ".join(text.split())
 
-    try:
-        uploaded_data = pd.read_csv(
-            io.BytesIO(uploaded_file.getvalue())
-            if hasattr(uploaded_file, "getvalue")
-            else io.BytesIO(uploaded_file)
-        )
-    except Exception as error:
-        return None, [], 0, 0, f"Could not read the uploaded CSV: {error}"
 
-    if uploaded_data.empty:
-        return None, [], 0, 0, "The uploaded CSV is empty."
+def column_matches_semantics(column_name, alias_set):
+    normalized = normalize_business_column_name(column_name)
+    if not normalized:
+        return False
 
-    missing_columns = [
-        column
-        for column in UPLOAD_REQUIRED_COLUMNS
-        if column not in uploaded_data.columns
+    normalized_aliases = {
+        normalize_business_column_name(alias)
+        for alias in alias_set
+    }
+
+    if normalized in normalized_aliases:
+        return True
+
+    tokens = set(normalized.split())
+    for alias in normalized_aliases:
+        alias_tokens = set(alias.split())
+        if alias_tokens and (
+            alias_tokens.issubset(tokens)
+            or tokens.issubset(alias_tokens)
+            or alias_tokens & tokens
+        ):
+            return True
+
+    return False
+
+
+def detect_business_column_semantics(column_name):
+    for semantic_name, alias_set in BUSINESS_SEMANTIC_ALIASES.items():
+        if column_matches_semantics(column_name, alias_set):
+            return semantic_name
+    return None
+
+
+def safe_numeric_conversion(series):
+    cleaned = series.copy()
+    cleaned = cleaned.map(
+        lambda value: value.strip() if isinstance(value, str) else value
+    )
+    cleaned = cleaned.replace({"": pd.NA, "N/A": pd.NA, "NA": pd.NA, "null": pd.NA, "None": pd.NA})
+    cleaned = cleaned.map(lambda value: value.replace("$", "").replace(",", "").replace("%", "") if isinstance(value, str) else value)
+    cleaned = pd.to_numeric(cleaned, errors="coerce")
+    return cleaned
+
+
+def classify_business_dataset(semantic_columns):
+    matched_semantics = set(semantic_columns.keys())
+    if not matched_semantics:
+        return "General Business Data", 0.0
+
+    best_label = "General Business Data"
+    best_score = 0.0
+
+    for label, required_semantics in DATASET_CLASSIFIERS:
+        score = sum(1 for item in required_semantics if item in matched_semantics)
+        if score > best_score:
+            best_label = label
+            best_score = score
+
+    max_possible = max(len(required) for _, required in DATASET_CLASSIFIERS)
+    confidence = min(0.99, (best_score / max(1, max_possible)) * 1.1)
+    if best_score == 0:
+        confidence = 0.15
+    return best_label, round(confidence, 2)
+
+
+def detect_uploaded_business_structure(frame):
+    mapping = {}
+    semantic_columns = {}
+
+    for column in frame.columns:
+        semantic = detect_business_column_semantics(column)
+        if semantic:
+            mapping[column] = semantic
+            semantic_columns.setdefault(semantic, []).append(column)
+
+    dataset_type, confidence = classify_business_dataset(semantic_columns)
+
+    if not mapping:
+        return {
+            "mapping": {},
+            "semantic_columns": {},
+            "dataset_type": "General Business Data",
+            "confidence": 0.0,
+            "is_business_like": False,
+            "column_quality": []
+        }
+
+    column_quality = []
+    for column in frame.columns:
+        values = frame[column]
+        missing = int(values.isna().sum())
+        unique_count = int(values.nunique(dropna=True))
+        numeric_like = pd.to_numeric(values, errors="coerce").notna().sum()
+        is_date_like = False
+        try:
+            pd.to_datetime(values, errors="raise")
+            is_date_like = True
+        except Exception:
+            is_date_like = False
+
+        semantic = mapping.get(column)
+        column_quality.append({
+            "Column": column,
+            "Detected Meaning": semantic or "Unclassified",
+            "Missing Values": missing,
+            "Unique Values": unique_count,
+            "Numeric-Like Values": numeric_like,
+            "Date-Like": is_date_like,
+            "Sample Values": values.dropna().head(3).tolist()
+        })
+
+    return {
+        "mapping": mapping,
+        "semantic_columns": semantic_columns,
+        "dataset_type": dataset_type,
+        "confidence": confidence,
+        "is_business_like": len(mapping) >= 2 or confidence >= 0.2,
+        "column_quality": column_quality
+    }
+
+
+def measure_data_quality(frame):
+    numeric_columns = []
+    categorical_columns = []
+    date_columns = []
+    issues = []
+
+    for column in frame.columns:
+        series = frame[column]
+        non_null = series.dropna()
+        if non_null.empty:
+            categorical_columns.append(column)
+            continue
+
+        numeric_values = pd.to_numeric(series, errors="coerce")
+        numeric_ratio = numeric_values.notna().mean()
+
+        try:
+            pd.to_datetime(series, errors="raise")
+            date_columns.append(column)
+        except Exception:
+            pass
+
+        if numeric_ratio > 0.7 and series.nunique(dropna=True) > 1:
+            numeric_columns.append(column)
+        else:
+            categorical_columns.append(column)
+
+        if numeric_ratio > 0.7 and series.isna().sum() > len(series) * 0.3:
+            issues.append(f"Column '{column}' has a large number of missing values.")
+
+    duplicate_rows = int(frame.duplicated().sum())
+    missing_values = int(frame.isna().sum().sum())
+
+    if duplicate_rows:
+        issues.append(f"{duplicate_rows} duplicate rows were detected.")
+
+    return {
+        "rows": len(frame),
+        "columns": len(frame.columns),
+        "missing_values": missing_values,
+        "duplicate_rows": duplicate_rows,
+        "numeric_columns": numeric_columns,
+        "categorical_columns": categorical_columns,
+        "date_columns": date_columns,
+        "issues": issues
+    }
+
+
+def resolve_metric_column(data, aliases):
+    for alias in aliases:
+        for column in data.columns:
+            if normalize_business_column_name(column) == normalize_business_column_name(alias):
+                return column
+    for alias in aliases:
+        alias_norm = normalize_business_column_name(alias)
+        for column in data.columns:
+            if normalize_business_column_name(column).startswith(alias_norm) or alias_norm.startswith(normalize_business_column_name(column)):
+                return column
+    for alias in aliases:
+        alias_norm = normalize_business_column_name(alias)
+        for column in data.columns:
+            if alias_norm in normalize_business_column_name(column).split():
+                return column
+    return None
+
+
+def generate_dynamic_kpis(data, semantic_info):
+    if data is None or data.empty:
+        return []
+
+    kpis = []
+    revenue_column = resolve_metric_column(data, ["revenue", "sales", "amount", "total sales", "total_amount", "turnover", "income", "gmv"])
+    profit_column = resolve_metric_column(data, ["profit", "net profit", "gross profit", "earnings", "margin"])
+    quantity_column = resolve_metric_column(data, ["quantity", "qty", "units", "units sold", "count", "items"])
+    order_column = resolve_metric_column(data, ["order id", "order_id", "transaction id", "invoice", "order number", "orders"])
+    customer_column = resolve_metric_column(data, ["customer", "customer name", "buyer", "client", "user"])
+    product_column = resolve_metric_column(data, ["product", "product name", "item", "sku"])
+    date_column = resolve_metric_column(data, ["date", "order date", "purchase date", "transaction date", "created at", "timestamp"])
+
+    revenue_series = safe_numeric_conversion(data[revenue_column]) if revenue_column else pd.Series(dtype=float)
+    profit_series = safe_numeric_conversion(data[profit_column]) if profit_column else pd.Series(dtype=float)
+    quantity_series = safe_numeric_conversion(data[quantity_column]) if quantity_column else pd.Series(dtype=float)
+
+    if not revenue_series.empty:
+        kpis.append({"label": "TOTAL REVENUE", "value": f"${revenue_series.sum():,.0f}"})
+    elif "sales" in data.columns:
+        series = safe_numeric_conversion(data["sales"])
+        kpis.append({"label": "TOTAL SALES", "value": f"${series.sum():,.0f}"})
+
+    if not profit_series.empty:
+        kpis.append({"label": "TOTAL PROFIT", "value": f"${profit_series.sum():,.0f}"})
+
+    if not quantity_series.empty:
+        kpis.append({"label": "TOTAL UNITS", "value": f"{quantity_series.sum():,.0f}"})
+
+    if order_column:
+        order_count = data[order_column].nunique() if data[order_column].dtype == object else len(data)
+        kpis.append({"label": "TOTAL ORDERS", "value": f"{order_count:,}"})
+
+    if customer_column:
+        kpis.append({"label": "UNIQUE CUSTOMERS", "value": f"{data[customer_column].nunique():,}"})
+
+    if product_column:
+        kpis.append({"label": "UNIQUE PRODUCTS", "value": f"{data[product_column].nunique():,}"})
+
+    if date_column:
+        parsed_dates = pd.to_datetime(data[date_column], errors="coerce")
+        valid_dates = parsed_dates.dropna()
+        if not valid_dates.empty:
+            kpis.append({"label": "DATE RANGE", "value": f"{valid_dates.min().date()} → {valid_dates.max().date()}"})
+
+    if revenue_column and order_column:
+        order_count = data[order_column].nunique() if data[order_column].dtype == object else len(data)
+        if order_count:
+            avg_order = revenue_series.sum() / order_count
+            kpis.append({"label": "AVERAGE ORDER VALUE", "value": f"${avg_order:,.0f}"})
+
+    if revenue_column and profit_column:
+        total_revenue = revenue_series.sum()
+        total_profit = profit_series.sum()
+        if total_revenue:
+            margin = (total_profit / total_revenue) * 100
+            kpis.append({"label": "PROFIT MARGIN", "value": f"{margin:.2f}%"})
+
+    return kpis
+
+
+def build_dynamic_charts(data, semantic_info):
+    if data is None or data.empty:
+        return []
+
+    charts = []
+    categories = [
+        ("date", "revenue"),
+        ("date", "sales"),
+        ("date", "amount"),
+        ("category", "revenue"),
+        ("category", "sales"),
+        ("category", "profit"),
+        ("product", "revenue"),
+        ("product", "sales"),
+        ("location", "revenue"),
+        ("location", "sales"),
+        ("channel", "revenue"),
+        ("channel", "sales"),
+        ("status", None)
     ]
 
-    if missing_columns:
-        return None, missing_columns, 0, 0, None
+    for dim, metric in categories:
+        if dim == "status":
+            status_column = resolve_metric_column(data, ["status", "order status", "delivery status", "payment status", "fulfilment"])
+            if status_column is not None:
+                counts = data[status_column].dropna().value_counts().head(10)
+                if not counts.empty:
+                    charts.append({"title": "Orders by Status", "type": "bar", "data": counts})
+            continue
+
+        dim_column = resolve_metric_column(data, [
+            dim,
+            dim.replace("_", " "),
+            "customer",
+            "region",
+            "location",
+            "category",
+            "product",
+            "item",
+            "market",
+            "type",
+            "channel",
+            "sales channel",
+            "state",
+            "country",
+            "city"
+        ])
+        metric_column = resolve_metric_column(data, [
+            metric or "revenue",
+            "sales",
+            "amount",
+            "total amount",
+            "income",
+            "profit",
+            "quantity",
+            "units",
+            "qty"
+        ]) if metric else None
+
+        if dim_column is None:
+            continue
+
+        if metric and metric_column is None:
+            continue
+
+        if dim == "date":
+            actual_date_col = resolve_metric_column(data, ["date", "order date", "purchase date", "transaction date", "created at", "timestamp"])
+            if actual_date_col is not None and metric_column is not None:
+                series = data[[actual_date_col, metric_column]].copy()
+                series[actual_date_col] = pd.to_datetime(series[actual_date_col], errors="coerce")
+                series = series.dropna()
+                if not series.empty:
+                    grouped = series.groupby(series[actual_date_col].dt.to_period("M").astype(str))[metric_column].sum()
+                    charts.append({"title": f"{metric.replace('_',' ').title()} Trend Over Time", "type": "line", "data": grouped})
+            continue
+
+        if metric and dim_column is not None and metric_column is not None:
+            metric_series = safe_numeric_conversion(data[metric_column])
+            grouped = data.assign(__metric=metric_series).groupby(data[dim_column].fillna("Unknown"))["__metric"].sum().sort_values(ascending=False).head(10)
+            if not grouped.empty:
+                title = f"Top {len(grouped)} {dim.replace('_',' ').title()} by {metric.replace('_',' ').title()}"
+                if dim == "location":
+                    title = f"{metric.replace('_',' ').title()} by Location"
+                elif dim == "channel":
+                    title = f"{metric.replace('_',' ').title()} by Channel"
+                elif dim == "product":
+                    title = f"Top 10 Products by {metric.replace('_',' ').title()}"
+                elif dim == "category":
+                    title = f"{metric.replace('_',' ').title()} by Category"
+                charts.append({"title": title, "type": "bar", "data": grouped})
+
+    numeric_columns = []
+    for column in data.columns:
+        if pd.to_numeric(data[column], errors="coerce").notna().sum() > max(1, len(data) * 0.5):
+            numeric_columns.append(column)
+
+    if len(numeric_columns) >= 2:
+        x_col = numeric_columns[0]
+        y_col = numeric_columns[1]
+        scatter_df = data[[x_col, y_col]].dropna()
+        if not scatter_df.empty:
+            charts.append({"title": f"{x_col} vs {y_col}", "type": "scatter", "data": scatter_df})
+
+    if not charts:
+        categorical_cols = [col for col in data.columns if col not in numeric_columns][:3]
+        for col in categorical_cols:
+            counts = data[col].dropna().value_counts().head(10)
+            if not counts.empty:
+                charts.append({"title": f"{col} Distribution", "type": "bar", "data": counts})
+
+    return charts
+
+
+def generate_business_insights(data, semantic_info):
+    insights = []
+    if data is None or data.empty:
+        return insights
+
+    category_column = resolve_metric_column(data, ["category", "product category", "type", "segment"])
+    product_column = resolve_metric_column(data, ["product", "product name", "item", "sku"])
+    location_column = resolve_metric_column(data, ["location", "city", "state", "country", "region", "area", "store"])
+    channel_column = resolve_metric_column(data, ["channel", "sales channel", "platform", "source"])
+    status_column = resolve_metric_column(data, ["status", "order status", "delivery status", "payment status", "fulfilment"])
+    revenue_column = resolve_metric_column(data, ["revenue", "sales", "amount", "total sales", "total_amount", "turnover", "income", "gmv"])
+    profit_column = resolve_metric_column(data, ["profit", "net profit", "gross profit", "earnings", "margin"])
+
+    if category_column and revenue_column:
+        cat_revenue = data[[category_column, revenue_column]].copy()
+        cat_revenue[revenue_column] = safe_numeric_conversion(cat_revenue[revenue_column])
+        top_category = cat_revenue.groupby(category_column)[revenue_column].sum().sort_values(ascending=False)
+        if not top_category.empty:
+            insights.append(f"{top_category.index[0]} generated the highest revenue.")
+
+    if product_column and revenue_column:
+        prod_revenue = data[[product_column, revenue_column]].copy()
+        prod_revenue[revenue_column] = safe_numeric_conversion(prod_revenue[revenue_column])
+        top_product = prod_revenue.groupby(product_column)[revenue_column].sum().sort_values(ascending=False)
+        if not top_product.empty:
+            insights.append(f"{top_product.index[0]} is the most frequently purchased product.")
+
+    if channel_column and revenue_column:
+        channel_revenue = data[[channel_column, revenue_column]].copy()
+        channel_revenue[revenue_column] = safe_numeric_conversion(channel_revenue[revenue_column])
+        top_channel = channel_revenue.groupby(channel_column)[revenue_column].sum().sort_values(ascending=False)
+        if not top_channel.empty:
+            insights.append(f"{top_channel.index[0]} contributes the largest share of revenue.")
+
+    if status_column:
+        status_counts = data[status_column].dropna().value_counts()
+        if not status_counts.empty:
+            insights.append(f"{status_counts.index[0]} is the most common order status.")
+
+    if location_column and revenue_column:
+        loc_revenue = data[[location_column, revenue_column]].copy()
+        loc_revenue[revenue_column] = safe_numeric_conversion(loc_revenue[revenue_column])
+        top_location = loc_revenue.groupby(location_column)[revenue_column].sum().sort_values(ascending=False)
+        if not top_location.empty:
+            insights.append(f"{top_location.index[0]} generated the strongest performance by location.")
+
+    if profit_column and revenue_column:
+        revenue_total = safe_numeric_conversion(data[revenue_column]).sum()
+        profit_total = safe_numeric_conversion(data[profit_column]).sum()
+        if revenue_total:
+            margin = (profit_total / revenue_total) * 100
+            insights.append(f"The current profit margin is {margin:.2f}%.")
+
+    if not insights:
+        insights.append("The uploaded dataset contains useful business information, but the available columns do not support a deeper automated insight yet.")
+
+    return insights[:5]
+
+
+def answer_business_question(question, data):
+    normalized_question = question.strip().lower()
+    if data is None or data.empty:
+        return "There is no data available for the current selection."
+
+    def get_column_aliases(*alias_groups):
+        for group in alias_groups:
+            for alias in group:
+                found = resolve_metric_column(data, [alias])
+                if found is not None:
+                    return found
+        return None
+
+    total_sales_col = get_column_aliases(["sales", "revenue", "amount", "total sales", "turnover", "income", "gmv"])
+    total_profit_col = get_column_aliases(["profit", "net profit", "gross profit", "earnings", "margin"])
+    total_quantity_col = get_column_aliases(["quantity", "qty", "units", "units sold", "items", "count"])
+    order_col = get_column_aliases(["order id", "order_id", "transaction id", "invoice", "order number", "orders"])
+    category_col = get_column_aliases(["category", "product category", "type", "segment"])
+    product_col = get_column_aliases(["product", "product name", "item", "sku"])
+    customer_col = get_column_aliases(["customer", "customer name", "buyer", "client", "user"])
+    location_col = get_column_aliases(["location", "city", "state", "country", "region", "area", "store"])
+    channel_col = get_column_aliases(["channel", "sales channel", "platform", "source"])
+    status_col = get_column_aliases(["status", "order status", "fulfilment", "delivery status", "payment status"])
+
+    if "total revenue" in normalized_question or "total sales" in normalized_question or "revenue" in normalized_question and "what is" in normalized_question:
+        if total_sales_col is None:
+            return "I can't calculate total revenue because the uploaded dataset does not contain a revenue or sales-related column."
+        total = safe_numeric_conversion(data[total_sales_col]).sum()
+        return f"Total revenue for the uploaded dataset is **${total:,.2f}**."
+
+    if "total profit" in normalized_question or "profit" in normalized_question and "what is" in normalized_question:
+        if total_profit_col is None:
+            return "I can't calculate profit because the uploaded dataset does not contain a profit-related column."
+        total = safe_numeric_conversion(data[total_profit_col]).sum()
+        return f"Total profit for the uploaded dataset is **${total:,.2f}**."
+
+    if "total quantity" in normalized_question or "units sold" in normalized_question or "quantity sold" in normalized_question:
+        if total_quantity_col is None:
+            return "I can't calculate quantity because the uploaded dataset does not contain a quantity-related column."
+        total = safe_numeric_conversion(data[total_quantity_col]).sum()
+        return f"Total quantity for the uploaded dataset is **{total:,.0f}**."
+
+    if "how many orders" in normalized_question or "order count" in normalized_question or "total orders" in normalized_question:
+        if order_col is None:
+            return "I can't answer that because the uploaded dataset does not contain an order or transaction identifier."
+        count = data[order_col].nunique() if data[order_col].dtype == object else len(data)
+        return f"There are **{count:,} orders** in the uploaded dataset."
+
+    if "category" in normalized_question and "highest" in normalized_question:
+        if category_col is None or total_sales_col is None:
+            return "I can't determine the best category because the uploaded dataset does not contain a category and revenue/sales column."
+        grouped = data[[category_col, total_sales_col]].copy()
+        grouped[total_sales_col] = safe_numeric_conversion(grouped[total_sales_col])
+        winner = grouped.groupby(category_col)[total_sales_col].sum().sort_values(ascending=False).idxmax()
+        value = grouped.groupby(category_col)[total_sales_col].sum().sort_values(ascending=False).max()
+        return f"{winner} has the highest sales with **${value:,.2f}**."
+
+    if "product" in normalized_question and "highest" in normalized_question:
+        if product_col is None or total_sales_col is None:
+            return "I can't identify the top product because the uploaded dataset does not contain a product and revenue/sales column."
+        grouped = data[[product_col, total_sales_col]].copy()
+        grouped[total_sales_col] = safe_numeric_conversion(grouped[total_sales_col])
+        winner = grouped.groupby(product_col)[total_sales_col].sum().sort_values(ascending=False).idxmax()
+        value = grouped.groupby(product_col)[total_sales_col].sum().sort_values(ascending=False).max()
+        return f"{winner} generated the highest sales with **${value:,.2f}**."
+
+    if "which customer" in normalized_question and "highest" in normalized_question:
+        if customer_col is None or total_sales_col is None:
+            return "I can't determine the top customer because the uploaded dataset does not contain a customer and sales/revenue column."
+        grouped = data[[customer_col, total_sales_col]].copy()
+        grouped[total_sales_col] = safe_numeric_conversion(grouped[total_sales_col])
+        winner = grouped.groupby(customer_col)[total_sales_col].sum().sort_values(ascending=False).idxmax()
+        value = grouped.groupby(customer_col)[total_sales_col].sum().sort_values(ascending=False).max()
+        return f"{winner} generated the highest sales with **${value:,.2f}**."
+
+    if "average order value" in normalized_question or "aov" in normalized_question:
+        if total_sales_col is None or order_col is None:
+            return "I can't calculate average order value because the uploaded dataset does not contain both revenue/sales and order identifiers."
+        sales_total = safe_numeric_conversion(data[total_sales_col]).sum()
+        count = data[order_col].nunique() if data[order_col].dtype == object else len(data)
+        if count == 0:
+            return "I can't calculate average order value because there are no valid order identifiers in the uploaded dataset."
+        aov = sales_total / count
+        return f"The average order value is **${aov:,.2f}**."
+
+    if "status" in normalized_question:
+        if status_col is None:
+            return "I can't answer that because the uploaded dataset does not contain a status column."
+        status_counts = data[status_col].dropna().value_counts()
+        if status_counts.empty:
+            return "No order status data is available in the uploaded dataset."
+        top_status = status_counts.idxmax()
+        top_value = status_counts.max()
+        return f"The most common status is **{top_status}** with **{top_value:,} records**."
+
+    if "what is the total sales" in normalized_question or "what is the sales" in normalized_question:
+        if total_sales_col is None:
+            return "I can't calculate total sales because the uploaded dataset does not contain a sales or revenue-related column."
+        total = safe_numeric_conversion(data[total_sales_col]).sum()
+        return f"Total sales for the uploaded dataset are **${total:,.2f}**."
+
+    return "I can answer questions about the metrics and dimensions available in the uploaded dataset, such as revenue, profit, quantity, orders, categories, products, customers, location, and status."
+
+
+def prepare_uploaded_data(uploaded_file, manual_mapping=None):
+    if uploaded_file is None:
+        return None, [], {}, 0, 0, "Please upload a CSV file."
+
+    try:
+        file_bytes = uploaded_file.getvalue() if hasattr(uploaded_file, "getvalue") else uploaded_file
+        uploaded_data = pd.read_csv(
+            io.BytesIO(file_bytes),
+            dtype=str,
+            keep_default_na=True,
+            na_values=["", " ", "NA", "N/A", "NULL", "null", "NaN", "nan"]
+        )
+    except Exception as error:
+        return None, [], {}, 0, 0, f"Could not read the uploaded CSV: {error}"
+
+    if uploaded_data.empty:
+        return None, [], {}, 0, 0, "The uploaded CSV is empty."
+
+    structure = detect_uploaded_business_structure(uploaded_data)
+    mapping = structure["mapping"]
+    preview = []
+    for column in uploaded_data.columns:
+        semantic = mapping.get(column, "Unclassified")
+        if semantic == "Unclassified":
+            status = "✕ Not detected"
+        else:
+            status = "✓ Automatically detected"
+        preview.append({
+            "Uploaded Column": column,
+            "Detected Meaning": semantic,
+            "Status": status
+        })
+
+    if not structure["is_business_like"]:
+        summary = {
+            "rows": len(uploaded_data),
+            "columns": len(uploaded_data.columns),
+            "detected_columns": [],
+            "missing_values": int(uploaded_data.isnull().sum().sum()),
+            "duplicate_rows": int(uploaded_data.duplicated().sum()),
+            "column_names": list(uploaded_data.columns),
+            "dataset_type": structure["dataset_type"],
+            "confidence": structure["confidence"]
+        }
+        return (
+            None,
+            preview,
+            summary,
+            0,
+            0,
+            "This dataset does not appear to contain common business information. Please upload a business, sales, retail, transaction, customer, marketing, inventory or financial dataset."
+        )
 
     cleaned_data = uploaded_data.copy()
 
-    cleaned_data["order_date"] = pd.to_datetime(
-        cleaned_data["order_date"],
-        errors="coerce"
-    )
-    cleaned_data["ship_date"] = pd.to_datetime(
-        cleaned_data["ship_date"],
-        errors="coerce"
-    )
+    semantic_columns = structure["semantic_columns"]
+    canonical_names = {
+        "date": "date",
+        "revenue": "revenue",
+        "quantity": "quantity",
+        "profit": "profit",
+        "product": "product",
+        "category": "category",
+        "customer": "customer",
+        "location": "location",
+        "order": "order_id",
+        "status": "status",
+        "channel": "channel",
+        "discount": "discount",
+        "cost": "cost"
+    }
 
-    numeric_columns = [
-        "sales",
-        "profit",
-        "quantity",
-        "discount",
-        "shipping_cost"
-    ]
+    for semantic, columns in semantic_columns.items():
+        if not columns:
+            continue
+        preferred = columns[0]
+        if preferred in cleaned_data.columns:
+            cleaned_data = cleaned_data.rename(columns={preferred: canonical_names.get(semantic, semantic)})
 
-    for column in numeric_columns:
-        cleaned_data[column] = pd.to_numeric(
-            cleaned_data[column],
-            errors="coerce"
-        )
+    for column in list(cleaned_data.columns):
+        if column == "date":
+            cleaned_data[column] = pd.to_datetime(cleaned_data[column], errors="coerce")
+        if column in {"revenue", "profit", "quantity", "discount", "cost"}:
+            cleaned_data[column] = safe_numeric_conversion(cleaned_data[column])
 
-    invalid_row_mask = cleaned_data[
-        UPLOAD_REQUIRED_COLUMNS
-    ].isnull().any(axis=1)
-    invalid_row_count = int(invalid_row_mask.sum())
-    cleaned_data = cleaned_data.loc[~invalid_row_mask].copy()
-
-    duplicate_row_count = int(cleaned_data.duplicated().sum())
     cleaned_data = cleaned_data.drop_duplicates().copy()
-    cleaned_data["year"] = cleaned_data["order_date"].dt.year
+    invalid_rows = int(cleaned_data.isna().all(axis=1).sum())
+    cleaned_data = cleaned_data.loc[~cleaned_data.isna().all(axis=1)].copy()
+
+    summary = {
+        "rows": len(uploaded_data),
+        "columns": len(uploaded_data.columns),
+        "detected_columns": sorted(mapping.keys()),
+        "missing_values": int(cleaned_data.isna().sum().sum()),
+        "duplicate_rows": int(uploaded_data.duplicated().sum()),
+        "column_names": list(uploaded_data.columns),
+        "dataset_type": structure["dataset_type"],
+        "confidence": structure["confidence"],
+        "quality": measure_data_quality(cleaned_data)
+    }
 
     return (
         cleaned_data,
-        [],
-        invalid_row_count,
-        duplicate_row_count,
+        preview,
+        summary,
+        invalid_rows,
+        int(uploaded_data.duplicated().sum()),
         None
     )
 
@@ -2773,6 +3673,9 @@ elif page == "🤖 AI Business Assistant":
         filtered_df
     )
 
+    if assistant_data is None:
+        assistant_data = filtered_df
+
     years_context = (
         "All Years"
         if len(selected_years) == len(years)
@@ -2788,6 +3691,11 @@ elif page == "🤖 AI Business Assistant":
         if len(selected_regions) == len(regions)
         else ", ".join(selected_regions)
     )
+
+    if assistant_data is None or assistant_data.empty:
+        assistant_order_count = 0
+    else:
+        assistant_order_count = assistant_data["order_id"].nunique() if "order_id" in assistant_data.columns else len(assistant_data)
 
     assistant_column, _ = st.columns([8, 1])
 
@@ -2818,8 +3726,8 @@ elif page == "🤖 AI Business Assistant":
                 years_context=years_context,
                 categories_context=categories_context,
                 regions_context=regions_context,
-                record_count=len(assistant_data),
-                order_count=assistant_data["order_id"].nunique()
+                record_count=len(assistant_data) if assistant_data is not None else 0,
+                order_count=assistant_order_count
             ),
             unsafe_allow_html=True
         )
@@ -2948,17 +3856,21 @@ elif page == "📂 Upload Business Data":
         key="business_data_uploader"
     )
 
+    manual_mapping = st.session_state.get("uploaded_business_manual_mapping", {})
+
     if uploaded_file is not None:
         (
             prepared_data,
-            missing_columns,
+            mapping_preview,
+            file_summary,
             invalid_row_count,
             duplicate_row_count,
             upload_error
-        ) = prepare_uploaded_data(uploaded_file)
+        ) = prepare_uploaded_data(uploaded_file, manual_mapping=manual_mapping)
 
         st.session_state.uploaded_business_data = prepared_data
-        st.session_state.uploaded_business_data_missing = missing_columns
+        st.session_state.uploaded_business_data_mapping = mapping_preview
+        st.session_state.uploaded_business_data_summary = file_summary
         st.session_state.uploaded_business_data_error = upload_error
         st.session_state.uploaded_business_data_quality = (
             invalid_row_count,
@@ -2968,21 +3880,31 @@ elif page == "📂 Upload Business Data":
             st.session_state.uploaded_assistant_data = None
 
     uploaded_data = st.session_state.get("uploaded_business_data")
-    missing_columns = st.session_state.get("uploaded_business_data_missing", [])
+    mapping_preview = st.session_state.get("uploaded_business_data_mapping", [])
+    file_summary = st.session_state.get("uploaded_business_data_summary", {})
     upload_error = st.session_state.get("uploaded_business_data_error")
     invalid_row_count, duplicate_row_count = st.session_state.get(
         "uploaded_business_data_quality",
         (0, 0)
     )
 
+    if uploaded_file is not None:
+        validation_status = "Ready to analyze" if uploaded_data is not None and not uploaded_data.empty else "Waiting for valid dataset"
+        st.markdown(
+            f"<div class='upload-intro'><div class='upload-intro-title'>Validation status</div><div class='upload-intro-copy'>{validation_status}</div></div>",
+            unsafe_allow_html=True
+        )
+
     if upload_error:
         st.error(upload_error)
-
-    if missing_columns:
-        st.error(
-            "⚠️ Invalid dataset structure. Please upload a CSV with the required business columns."
-        )
-        st.write("Missing columns: " + ", ".join(missing_columns))
+        st.markdown("### Supported business dataset examples")
+        supported_examples = [
+            "Date, Product, Category, Revenue, Profit",
+            "Order ID, Date, Customer, Product, Quantity, Sales",
+            "Region, Category, Sales, Discount, Profit"
+        ]
+        for example in supported_examples:
+            st.write(f"• {example}")
 
     if uploaded_data is None:
         st.info(
@@ -2991,8 +3913,76 @@ elif page == "📂 Upload Business Data":
     elif uploaded_data.empty:
         st.warning("No valid rows remain after cleaning the uploaded CSV.")
     else:
-        st.success(
-            f"Uploaded dataset validated: {len(uploaded_data):,} usable records."
+        total_rows = int(file_summary.get("rows", len(uploaded_data)))
+        total_columns = int(file_summary.get("columns", len(uploaded_data.columns)))
+        missing_values = int(file_summary.get("missing_values", uploaded_data.isnull().sum().sum()))
+        duplicate_rows = int(file_summary.get("duplicate_rows", duplicate_row_count))
+        detected_columns = list(file_summary.get("detected_columns", []))
+        missing_attention = missing_values > max(25, total_rows * 0.05)
+
+        st.markdown(
+            """
+            <div class="validation-banner">
+                <div class="validation-banner-title">✓ Dataset validated successfully</div>
+                <div class="validation-banner-subtitle">{rows:,} usable records</div>
+            </div>
+            """.format(rows=total_rows),
+            unsafe_allow_html=True
+        )
+
+        st.markdown(
+            """
+            <div class="dataset-overview-card">
+                <div class="dataset-overview-header">Dataset Overview</div>
+                <div class="dataset-metric-grid">
+                    <div class="dataset-metric-card healthy">
+                        <div class="dataset-metric-label">Rows</div>
+                        <div class="dataset-metric-value">{rows}</div>
+                    </div>
+                    <div class="dataset-metric-card healthy">
+                        <div class="dataset-metric-label">Columns</div>
+                        <div class="dataset-metric-value">{columns}</div>
+                    </div>
+                    <div class="dataset-metric-card {missing_class}">
+                        <div class="dataset-metric-label">Missing Values</div>
+                        <div class="dataset-metric-value">{missing}</div>
+                        <div class="dataset-metric-footnote">{missing_note}</div>
+                    </div>
+                    <div class="dataset-metric-card {duplicate_class}">
+                        <div class="dataset-metric-label">Duplicate Rows</div>
+                        <div class="dataset-metric-value">{duplicates}</div>
+                        <div class="dataset-metric-footnote">{duplicate_note}</div>
+                    </div>
+                </div>
+            </div>
+            """.format(
+                rows=f"{total_rows:,}",
+                columns=f"{total_columns:,}",
+                missing=f"{missing_values:,}",
+                duplicates=f"{duplicate_rows:,}",
+                missing_class="warning" if missing_attention else "healthy",
+                duplicate_class="healthy" if duplicate_rows == 0 else "warning",
+                missing_note="Review recommended" if missing_attention else "Healthy range",
+                duplicate_note="No duplicate rows" if duplicate_rows == 0 else "Needs review"
+            ),
+            unsafe_allow_html=True
+        )
+
+        st.markdown(
+            """
+            <div class="dataset-columns-card">
+                <div class="dataset-columns-header">Detected Columns</div>
+                <div class="dataset-column-pills">
+                    {badges}
+                </div>
+            </div>
+            """.format(
+                badges="".join(
+                    f"<span class='dataset-column-pill'>{value}</span>"
+                    for value in (detected_columns or ["No detected columns"])
+                )
+            ),
+            unsafe_allow_html=True
         )
 
         if invalid_row_count or duplicate_row_count:
@@ -3001,153 +3991,156 @@ elif page == "📂 Upload Business Data":
                 f"{duplicate_row_count:,} duplicate rows removed."
             )
 
-        upload_years = sorted(uploaded_data["year"].dropna().unique().tolist())
-        upload_categories = sorted(uploaded_data["category"].dropna().unique().tolist())
-        upload_regions = sorted(uploaded_data["region"].dropna().unique().tolist())
-        upload_ship_modes = sorted(uploaded_data["ship_mode"].dropna().unique().tolist())
+        if mapping_preview:
+            mapping_df = pd.DataFrame(mapping_preview)
+            st.markdown(
+                "<div class='muted-caption'>Detailed mapping preview below for validation and manual review.</div>",
+                unsafe_allow_html=True
+            )
+            st.dataframe(mapping_df, use_container_width=True)
+
+            unresolved_columns = [
+                row["Uploaded Column"]
+                for row in mapping_preview
+                if row["Status"] != "✓ Automatically detected"
+            ]
+
+            if unresolved_columns:
+                st.markdown("### Manual Mapping Review")
+                for column_name in unresolved_columns:
+                    options = ["Not used"] + sorted(STANDARD_FIELD_ORDER)
+                    current_index = options.index(
+                        next(
+                            (
+                                row["Standard Field"]
+                                for row in mapping_preview
+                                if row["Uploaded Column"] == column_name
+                            ),
+                            "Not used"
+                        )
+                    ) if next(
+                        (
+                            row["Standard Field"]
+                            for row in mapping_preview
+                            if row["Uploaded Column"] == column_name
+                        ),
+                        ""
+                    ) in options else 0
+                    selected_field = st.selectbox(
+                        f"Map '{column_name}' to a standard field",
+                        options,
+                        index=current_index,
+                        key=f"manual_map_{column_name}"
+                    )
+                    if selected_field != "Not used":
+                        manual_mapping[column_name] = selected_field
+                st.session_state.uploaded_business_manual_mapping = manual_mapping
+
+                if st.button("Apply Manual Mapping"):
+                    if uploaded_file is not None:
+                        (
+                            prepared_data,
+                            mapping_preview,
+                            file_summary,
+                            invalid_row_count,
+                            duplicate_row_count,
+                            upload_error
+                        ) = prepare_uploaded_data(uploaded_file, manual_mapping=manual_mapping)
+
+                        st.session_state.uploaded_business_data = prepared_data
+                        st.session_state.uploaded_business_data_mapping = mapping_preview
+                        st.session_state.uploaded_business_data_summary = file_summary
+                        st.session_state.uploaded_business_data_error = upload_error
+                        st.session_state.uploaded_business_data_quality = (
+                            invalid_row_count,
+                            duplicate_row_count
+                        )
+                        if prepared_data is None:
+                            st.session_state.uploaded_assistant_data = None
+
+        st.markdown("### Upload Analysis")
+        if st.button("Analyze Uploaded Data"):
+            st.success("Analysis started for the uploaded dataset.")
+
+        if "sales" in uploaded_data.columns and "profit" in uploaded_data.columns:
+            upload_total_sales = uploaded_data["sales"].sum()
+            upload_total_profit = uploaded_data["profit"].sum()
+        else:
+            upload_total_sales = uploaded_data["sales"].sum() if "sales" in uploaded_data.columns else 0
+            upload_total_profit = uploaded_data["profit"].sum() if "profit" in uploaded_data.columns else 0
+
+        upload_total_orders = uploaded_data["order_id"].nunique() if "order_id" in uploaded_data.columns else len(uploaded_data)
+        upload_total_quantity = uploaded_data["quantity"].sum() if "quantity" in uploaded_data.columns else 0
+        upload_total_customers = uploaded_data["customer_name"].nunique() if "customer_name" in uploaded_data.columns else 0
+        upload_profit_margin = (
+            (upload_total_profit / upload_total_sales) * 100
+            if upload_total_sales != 0
+            else 0
+        )
 
         st.markdown(
-            '<div class="upload-section-title">🔎 Uploaded Data Filters</div>',
+            '<div class="upload-section-title">📊 Uploaded Business Data Overview</div>',
             unsafe_allow_html=True
         )
 
-        filter_col1, filter_col2, filter_col3, filter_col4 = st.columns(4)
+        kpi_columns = st.columns(6)
+        kpi_columns[0].metric("💰 Total Sales", f"${upload_total_sales:,.0f}")
+        kpi_columns[1].metric("📈 Total Profit", f"${upload_total_profit:,.0f}")
+        kpi_columns[2].metric("🛒 Orders", f"{upload_total_orders:,}")
+        kpi_columns[3].metric("📦 Quantity", f"{upload_total_quantity:,.0f}")
+        kpi_columns[4].metric("📊 Profit Margin", f"{upload_profit_margin:.2f}%")
+        kpi_columns[5].metric("👥 Customers", f"{upload_total_customers:,}")
 
-        with filter_col1:
-            selected_upload_years = st.multiselect(
-                "Year",
-                upload_years,
-                default=upload_years,
-                key="uploaded_year_filter"
-            )
-        with filter_col2:
-            selected_upload_categories = st.multiselect(
-                "Category",
-                upload_categories,
-                default=upload_categories,
-                key="uploaded_category_filter"
-            )
-        with filter_col3:
-            selected_upload_regions = st.multiselect(
-                "Region",
-                upload_regions,
-                default=upload_regions,
-                key="uploaded_region_filter"
-            )
-        with filter_col4:
-            selected_upload_ship_modes = st.multiselect(
-                "Ship Mode",
-                upload_ship_modes,
-                default=upload_ship_modes,
-                key="uploaded_ship_mode_filter"
-            )
+        st.markdown(
+            '<div class="upload-section-title">📈 Dynamic Insights</div>',
+            unsafe_allow_html=True
+        )
 
-        uploaded_filtered_data = uploaded_data[
-            uploaded_data["year"].isin(selected_upload_years)
-            & uploaded_data["category"].isin(selected_upload_categories)
-            & uploaded_data["region"].isin(selected_upload_regions)
-            & uploaded_data["ship_mode"].isin(selected_upload_ship_modes)
-        ].copy()
-
-        st.session_state.uploaded_assistant_data = uploaded_filtered_data
-
-        if uploaded_filtered_data.empty:
-            st.warning("No uploaded records match the current filters.")
-        else:
-            upload_total_sales = uploaded_filtered_data["sales"].sum()
-            upload_total_profit = uploaded_filtered_data["profit"].sum()
-            upload_total_orders = uploaded_filtered_data["order_id"].nunique()
-            upload_total_quantity = uploaded_filtered_data["quantity"].sum()
-            upload_total_customers = uploaded_filtered_data["customer_name"].nunique()
-            upload_profit_margin = (
-                (upload_total_profit / upload_total_sales) * 100
-                if upload_total_sales != 0
-                else 0
-            )
-
-            st.markdown(
-                '<div class="upload-section-title">📊 Uploaded Business Data Overview</div>',
-                unsafe_allow_html=True
-            )
-
-            kpi_columns = st.columns(6)
-            kpi_columns[0].metric("💰 Total Sales", f"${upload_total_sales:,.0f}")
-            kpi_columns[1].metric("📈 Total Profit", f"${upload_total_profit:,.0f}")
-            kpi_columns[2].metric("🛒 Total Orders", f"{upload_total_orders:,}")
-            kpi_columns[3].metric("📦 Total Quantity", f"{upload_total_quantity:,.0f}")
-            kpi_columns[4].metric("📊 Profit Margin", f"{upload_profit_margin:.2f}%")
-            kpi_columns[5].metric("👥 Total Customers", f"{upload_total_customers:,}")
-
-            st.markdown(
-                '<div class="upload-section-title">📈 Uploaded Data Analytics</div>',
-                unsafe_allow_html=True
-            )
-
-            trend_data = (
-                uploaded_filtered_data.assign(
-                    month=uploaded_filtered_data["order_date"].dt.to_period("M").astype(str)
-                )
-                .groupby("month")["sales"]
-                .sum()
-            )
-            category_sales = uploaded_filtered_data.groupby("category")["sales"].sum()
-            category_profit = uploaded_filtered_data.groupby("category")["profit"].sum()
-            region_sales = uploaded_filtered_data.groupby("region")["sales"].sum()
-            region_profit = uploaded_filtered_data.groupby("region")["profit"].sum()
-            top_customers = (
-                uploaded_filtered_data.groupby("customer_name")["profit"]
-                .sum()
-                .sort_values(ascending=False)
-                .head(10)
-            )
-            loss_subcategories = (
-                uploaded_filtered_data.groupby("sub_category")["profit"]
-                .sum()
-            )
-            loss_subcategories = loss_subcategories[loss_subcategories < 0].sort_values()
-
-            chart_col1, chart_col2 = st.columns(2)
-            with chart_col1:
-                st.subheader("📅 Sales Trend")
+        insight_blocks = []
+        if "order_date" in uploaded_data.columns:
+            trend_data = uploaded_data.assign(month=uploaded_data["order_date"].dt.to_period("M").astype(str)).groupby("month").agg(sales=("sales", "sum"))
+            if not trend_data.empty:
+                st.subheader("📅 Sales Trend Over Time")
                 st.line_chart(trend_data)
+        if "category" in uploaded_data.columns and "sales" in uploaded_data.columns:
+            category_sales = uploaded_data.groupby("category")["sales"].sum().sort_values(ascending=False)
+            if not category_sales.empty:
                 st.subheader("📦 Sales by Category")
                 st.bar_chart(category_sales)
-                st.subheader("🌍 Sales by Region")
-                st.bar_chart(region_sales)
-            with chart_col2:
-                st.subheader("📦 Profit by Category")
+        if "category" in uploaded_data.columns and "profit" in uploaded_data.columns:
+            category_profit = uploaded_data.groupby("category")["profit"].sum().sort_values(ascending=False)
+            if not category_profit.empty:
+                st.subheader("📈 Profit by Category")
                 st.bar_chart(category_profit)
-                st.subheader("🌍 Profit by Region")
-                st.bar_chart(region_profit)
-                st.subheader("👥 Top 10 Customers by Profit")
+        if "product_name" in uploaded_data.columns and "sales" in uploaded_data.columns:
+            top_products = uploaded_data.groupby("product_name")["sales"].sum().sort_values(ascending=False).head(10)
+            if not top_products.empty:
+                st.subheader("🏆 Top Products by Sales")
+                st.bar_chart(top_products)
+        if "customer_name" in uploaded_data.columns and "sales" in uploaded_data.columns:
+            top_customers = uploaded_data.groupby("customer_name")["sales"].sum().sort_values(ascending=False).head(10)
+            if not top_customers.empty:
+                st.subheader("👥 Top Customers by Sales")
                 st.bar_chart(top_customers)
+        if "discount" in uploaded_data.columns and "profit" in uploaded_data.columns:
+            discount_profit = uploaded_data[["discount", "profit"]].dropna()
+            if not discount_profit.empty:
+                st.subheader("💸 Discount vs Profit")
+                st.scatter_chart(discount_profit)
+        if "region" in uploaded_data.columns and "sales" in uploaded_data.columns:
+            region_sales = uploaded_data.groupby("region")["sales"].sum().sort_values(ascending=False)
+            if not region_sales.empty:
+                st.subheader("🌍 Regional Sales")
+                st.bar_chart(region_sales)
 
-            st.subheader("⚠️ Loss-Making Sub-Categories")
-            if loss_subcategories.empty:
-                st.success("No loss-making sub-categories found in the current filtered data.")
-            else:
-                st.bar_chart(loss_subcategories)
+        if "category" in uploaded_data.columns and "profit" in uploaded_data.columns:
+            best_category = uploaded_data.groupby("category")["profit"].sum().idxmax()
+            st.caption(f"Best category by profit: {best_category}")
 
-            st.markdown(
-                '<div class="upload-section-title">💡 Business Insights</div>',
-                unsafe_allow_html=True
-            )
-
-            best_category = category_profit.idxmax()
-            best_region = region_profit.idxmax()
-            lowest_category = category_profit.idxmin()
-            customer_sales = uploaded_filtered_data.groupby("customer_name")["sales"].sum()
-            majority_customer_count = int(
-                (customer_sales.sort_values(ascending=False).cumsum()
-                 <= customer_sales.sum() * 0.8).sum()
-            )
-
-            st.markdown(
-                f"- **{best_category}** generated the highest profit.\n"
-                f"- **{best_region}** generated the highest profit by region.\n"
-                f"- **{lowest_category}** has the lowest profit among categories.\n"
-                f"- The top **{majority_customer_count:,} customers** generated approximately 80% of sales."
-            )
+        uploaded_filtered_data = uploaded_data.copy()
+        if "year" in uploaded_filtered_data.columns:
+            uploaded_filtered_data = uploaded_filtered_data[uploaded_filtered_data["year"].notna()].copy()
+        st.session_state.uploaded_assistant_data = uploaded_filtered_data
 
 
 # ============================================================
